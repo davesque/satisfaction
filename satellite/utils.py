@@ -36,11 +36,18 @@ class SlotClass:
 
     def __repr__(self) -> str:
         first_line = f"{type(self).__qualname__}("
-        slot_lines = tuple(
-            indent(repr(v), "  ") + ","
-            for v in self.__values__()
-        )
+        slot_lines = tuple(indent(repr(v), "  ") + "," for v in self.__values__())
         last_line = ")"
 
         lines = (first_line,) + slot_lines + (last_line,)
         return "\n".join(lines)
+
+    def __eq__(self, other: Any) -> bool:
+        if type(self) is not type(other):
+            return False
+
+        for x, y in zip(self.__values__(), other.__values__()):
+            if x != y:
+                return False
+
+        return True

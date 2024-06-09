@@ -94,3 +94,12 @@ def test_slot_class_repr() -> None:
         """
         )[1:-1]
     )
+
+
+def test_slot_class_eq() -> None:
+    nested1 = Nested("val", TwoSlot("foo", "bar"))
+    nested2 = Nested("val", TwoSlot("foo", "bing"))
+    nested3 = Nested("val", TwoSlot("foo", "bar"))
+
+    assert nested1 != nested2
+    assert nested1 == nested3
