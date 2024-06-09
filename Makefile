@@ -6,7 +6,7 @@ PYTEST := $(VENV)/bin/pytest
 setup:
 	python3 -mvenv $(VENV)
 	$(PIP) install --upgrade pip setuptools wheel
-	$(PIP) install -r requirements.txt
+	$(PIP) install -e .[dev]
 
 .PHONY: test
 test:
