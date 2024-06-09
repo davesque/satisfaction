@@ -10,4 +10,4 @@ setup:
 
 .PHONY: test
 test:
-	$(PYTEST) .
+	$(PYTEST) -v .

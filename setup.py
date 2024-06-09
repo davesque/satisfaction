@@ -11,6 +11,7 @@ extras_require = {
         "ruff",
         "black",
         "pyright",
+        "pynvim",
     ],
     "dev": [
         "ipython",
