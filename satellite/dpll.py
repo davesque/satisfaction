@@ -1,4 +1,5 @@
-from typing import Optional, TypeVar
+from collections import defaultdict
+from typing import Optional, Set, TypeVar
 
 from satellite.expr import And, Expr, Or
 
@@ -45,3 +46,20 @@ def unit_propagate(lit: Expr, and_expr: And) -> And:
             and_args.append(Or(*or_args))
 
     return And(*and_args)
+
+
+def find_pure(and_expr: And) -> Set[Expr]:
+    assert isinstance(and_expr, And)
+
+    lit_variants = defaultdict(set)
+    for or_expr in and_expr.args:
+        assert isinstance(or_expr, Or)
+
+        for or_lit in or_expr.args:
+            atom = or_lit.atom
+            assert atom is not None
+
+            lit_variants[atom].add(or_lit)
+
+    pure_lits = {tuple(v)[0] for v in lit_variants.values() if len(v) == 1}
+    return pure_lits
