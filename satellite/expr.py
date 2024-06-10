@@ -27,7 +27,7 @@ class Expr(SlotClass):
         else:
             return Or((self, other))
 
-    def __ror__(self, other: Any) -> None:
+    def __ror__(self, _: Any) -> None:
         raise ValueError(f"cannot disjoin with non-expression")
 
     def __and__(self, other: Any) -> And:
@@ -43,7 +43,7 @@ class Expr(SlotClass):
         else:
             return And((self, other))
 
-    def __rand__(self, other: Any) -> None:
+    def __rand__(self, _: Any) -> None:
         raise ValueError(f"cannot conjoin with non-expression")
 
     @property
