@@ -37,6 +37,11 @@ class TestExpr:
         assert x & (y & z) == And(x, y, z)
         assert (w & x) & (y & z) == And(w, x, y, z)
 
+    def test_hash(self) -> None:
+        assert hash(x) == hash(Var("x"))
+        assert hash(x | y) == hash(x | y)
+        assert hash(x | y) != hash(x & y)
+
     def test_atom(self) -> None:
         not_x = ~x
         or_x = x | x

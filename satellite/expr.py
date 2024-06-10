@@ -46,6 +46,9 @@ class Expr(SlotClass):
     def __rand__(self, _: Any) -> None:
         raise ValueError(f"cannot conjoin with non-expression")
 
+    def __hash__(self) -> int:
+        return hash((type(self),) + tuple(self.__values__()))
+
     @property
     def atom(self) -> Optional[Var]:
         return None
