@@ -1,6 +1,6 @@
 import pytest
 
-from satellite.expr import And, Not, Or, Var
+from satellite.expr import And, Not, Or, Var, var
 
 
 class TestExpr:
@@ -56,3 +56,14 @@ class TestExpr:
         assert not_x.atom == x
         assert or_x.atom is None
         assert and_x.atom is None
+
+
+def test_var() -> None:
+    w = Var("w")
+    x = Var("x")
+    y = Var("y")
+    z = Var("z")
+
+    assert var("w x y z") == (w, x, y, z)
+    assert var("w x", "y z") == (w, x, y, z)
+    assert var("w, x, y, z", sep=",") == (w, x, y, z)

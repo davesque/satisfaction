@@ -82,3 +82,12 @@ class And(Expr):
     __slots__ = ("args",)
 
     args: Tuple[Expr, ...]
+
+
+def var(*specs: str, sep: Optional[str] = None) -> Tuple[Var, ...]:
+    res = []
+    for spec in specs:
+        for v in spec.split(sep=sep):
+            res.append(Var(v.strip()))
+
+    return tuple(res)
