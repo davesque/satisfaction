@@ -45,3 +45,14 @@ class TestExpr:
         assert (x & y) & z == And((x, y, z))
         assert x & (y & z) == And((x, y, z))
         assert (w & x) & (y & z) == And((w, x, y, z))
+
+    def test_atom(self) -> None:
+        x = Var("x")
+        not_x = ~x
+        or_x = x | x
+        and_x = x & x
+
+        assert x.atom == x
+        assert not_x.atom == x
+        assert or_x.atom is None
+        assert and_x.atom is None

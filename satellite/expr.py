@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 
 from satellite.utils import SlotClass
 
@@ -46,17 +46,30 @@ class Expr(SlotClass):
     def __rand__(self, other: Any) -> None:
         raise ValueError(f"cannot conjoin with non-expression")
 
+    @property
+    def atom(self) -> Optional[Var]:
+        return None
+
 
 class Not(Expr):
     __slots__ = ("expr",)
 
     expr: Expr
 
+    @property
+    def atom(self) -> Optional[Var]:
+        # not `None` if `self.expr` is a `Var`
+        return self.expr.atom
+
 
 class Var(Expr):
     __slots__ = ("name",)
 
     name: str
+
+    @property
+    def atom(self) -> Optional[Var]:
+        return self
 
 
 class Or(Expr):
