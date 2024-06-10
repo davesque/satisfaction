@@ -10,4 +10,4 @@ setup:
 
 .PHONY: test
 test:
-	$(PYTEST) -v --cov-report term-missing --cov=satellite .
+	$(PYTEST) -vv --cov-report term-missing --cov=satellite .
