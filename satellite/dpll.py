@@ -63,3 +63,16 @@ def find_pure(and_expr: And) -> Set[Expr]:
 
     pure_lits = {tuple(v)[0] for v in lit_variants.values() if len(v) == 1}
     return pure_lits
+
+
+def pure_literal_assign(lit: Expr, and_expr: And) -> And:
+    assert isinstance(and_expr, And)
+
+    and_args = []
+    for or_expr in and_expr.args:
+        assert isinstance(or_expr, Or)
+
+        if lit not in or_expr.args:
+            and_args.append(or_expr)
+
+    return And(*and_args)
