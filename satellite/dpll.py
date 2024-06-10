@@ -1,10 +1,45 @@
 from collections import defaultdict
-from typing import Optional, Set, TypeVar
+from typing import Optional, Set, cast
 
 from satellite.expr import And, Expr, Or
 
 
-T = TypeVar("T", bound=Expr)
+def dpll(expr: And) -> bool:
+    """
+    The Davis-Putnam-Logemann-Loveland (DPLL) SAT algorithm.
+
+    Implementation based on the following description:
+    https://en.wikipedia.org/wiki/DPLL_algorithm
+    """
+    while lit := find_unit(expr):
+        expr = unit_propagate(lit, expr)
+
+    while pure_lits := find_pure(expr):
+        for lit in pure_lits:
+            expr = pure_literal_assign(lit, expr)
+
+    # If the root conjunction is empty, this implies that the formula is
+    # satisfiable.  This follows from the fact that any clause that was
+    # eliminated from the root conjunction was determined to have a truth value
+    # of `true`. Therefore, the root conjunction also evaluates to true.
+    if len(expr.args) == 0:
+        return True
+
+    # If any disjunctive clause is empty, this implies that the formula is not
+    # satisfiable.  This follows from the fact that any literal that was
+    # eliminated from a disjunction was determined to have a truth value of
+    # `false`.  Therefore, the parent disjunction evaluates to `false` and the
+    # root conjunction also evaluate to `false`.
+    for or_expr in expr.args:
+        assert isinstance(or_expr, Or)
+
+        if len(or_expr.args) == 0:
+            return False
+
+    first_or = cast(Or, expr.args[0])
+    lit = first_or.args[0]
+
+    return dpll(unit_propagate(lit, expr)) or dpll(unit_propagate(~lit, expr))
 
 
 def find_unit(and_expr: And) -> Optional[Expr]:

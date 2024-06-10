@@ -1,4 +1,12 @@
-from satellite.dpll import find_pure, find_unit, pure_literal_assign, unit_propagate
+import pytest
+
+from satellite.dpll import (
+    dpll,
+    find_pure,
+    find_unit,
+    pure_literal_assign,
+    unit_propagate,
+)
 from satellite.expr import And, Or, var
 
 w, x, y, z = var("w x y z")
@@ -29,3 +37,26 @@ def test_find_pure() -> None:
 def test_pure_literal_assign() -> None:
     assert pure_literal_assign(y, (w | ~w) & (y | z)) == And(w | ~w)
     assert pure_literal_assign(~x, (w | ~w) & (y | z) & (w | ~x)) == (w | ~w) & (y | z)
+
+
+@pytest.mark.parametrize(
+    "and_expr",
+    (
+        And(Or(x)),
+        And(Or(~x)),
+        And(x | y),
+        And(x | x),
+        And(x | ~x),
+        And(~x | ~x),
+    ),
+)
+def test_dpll_sat(and_expr: And) -> None:
+    assert dpll(and_expr)
+
+
+@pytest.mark.parametrize(
+    "and_expr",
+    (And(Or(x), Or(~x)),),
+)
+def test_dpll_unsat(and_expr: And) -> None:
+    assert not dpll(and_expr)
