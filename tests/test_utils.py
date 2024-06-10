@@ -45,7 +45,6 @@ class TestSlotClass:
             with pytest.raises(AttributeError):
                 two.__dict__
 
-
     @pytest.mark.parametrize(
         "should_throw_error",
         (
@@ -60,15 +59,12 @@ class TestSlotClass:
         with pytest.raises(TypeError, match="requires a setting for"):
             should_throw_error()
 
-
     def test_class_keys(self) -> None:
         assert tuple(Inherited.__keys__()) == ("foo", "bar", "bing")
-
 
     def test_class_values(self) -> None:
         inherited = Inherited(1, 2, 3)
         assert tuple(inherited.__values__()) == (1, 2, 3)
-
 
     def test_class_repr(self) -> None:
         nested = Nested("val", TwoSlot("foo", "bar"))
@@ -87,7 +83,6 @@ class TestSlotClass:
             """
             )[1:-1]
         )
-
 
     def test_class_eq(self) -> None:
         nested1 = Nested("val", TwoSlot("foo", "bar"))
