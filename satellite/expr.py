@@ -50,6 +50,21 @@ class Expr(SlotClass):
     def atom(self) -> Optional[Var]:
         return None
 
+    @property
+    def is_cnf(self) -> bool:
+        if not isinstance(self, And):
+            return False
+
+        for and_arg in self.args:
+            if not isinstance(and_arg, Or):
+                return False
+
+            for or_arg in and_arg.args:
+                if or_arg.atom is None:
+                    return False
+
+        return True
+
 
 class Not(Expr):
     __slots__ = ("expr",)
