@@ -20,10 +20,10 @@ class TestExpr:
             _ = 1 | x
 
     def test_or(self) -> None:
-        assert x | y == Or((x, y))
-        assert (x | y) | z == Or((x, y, z))
-        assert x | (y | z) == Or((x, y, z))
-        assert (w | x) | (y | z) == Or((w, x, y, z))
+        assert x | y == Or(x, y)
+        assert (x | y) | z == Or(x, y, z)
+        assert x | (y | z) == Or(x, y, z)
+        assert (w | x) | (y | z) == Or(w, x, y, z)
 
     def test_and_raises(self) -> None:
         with pytest.raises(ValueError, match="cannot conjoin"):
@@ -32,10 +32,10 @@ class TestExpr:
             _ = 1 & x
 
     def test_and(self) -> None:
-        assert x & y == And((x, y))
-        assert (x & y) & z == And((x, y, z))
-        assert x & (y & z) == And((x, y, z))
-        assert (w & x) & (y & z) == And((w, x, y, z))
+        assert x & y == And(x, y)
+        assert (x & y) & z == And(x, y, z)
+        assert x & (y & z) == And(x, y, z)
+        assert (w & x) & (y & z) == And(w, x, y, z)
 
     def test_atom(self) -> None:
         not_x = ~x

@@ -19,13 +19,13 @@ class Expr(SlotClass):
             raise ValueError(f"cannot disjoin with non-expression")
 
         if isinstance(self, Or) and isinstance(other, Or):
-            return Or(self.args + other.args)
+            return Or(*(self.args + other.args))
         elif isinstance(self, Or):
-            return Or(self.args + (other,))
+            return Or(*(self.args + (other,)))
         elif isinstance(other, Or):
-            return Or((self,) + other.args)
+            return Or(*((self,) + other.args))
         else:
-            return Or((self, other))
+            return Or(*(self, other))
 
     def __ror__(self, _: Any) -> None:
         raise ValueError(f"cannot disjoin with non-expression")
@@ -35,13 +35,13 @@ class Expr(SlotClass):
             raise ValueError(f"cannot conjoin with non-expression")
 
         if isinstance(self, And) and isinstance(other, And):
-            return And(self.args + other.args)
+            return And(*(self.args + other.args))
         elif isinstance(self, And):
-            return And(self.args + (other,))
+            return And(*(self.args + (other,)))
         elif isinstance(other, And):
-            return And((self,) + other.args)
+            return And(*((self,) + other.args))
         else:
-            return And((self, other))
+            return And(*(self, other))
 
     def __rand__(self, _: Any) -> None:
         raise ValueError(f"cannot conjoin with non-expression")
@@ -96,21 +96,22 @@ class Var(Expr):
         return self.name
 
 
-class Or(Expr):
+class Connective(Expr):
     __slots__ = ("args",)
 
     args: Tuple[Expr, ...]
 
+    def __init__(self, *args: Expr):
+        super().__init__(args)
+
+
+class Or(Connective):
     def __repr__(self) -> str:
         args_repr = " | ".join(map(repr, self.args))
         return f"({args_repr})"
 
 
-class And(Expr):
-    __slots__ = ("args",)
-
-    args: Tuple[Expr, ...]
-
+class And(Connective):
     def __repr__(self) -> str:
         return " & ".join(map(repr, self.args))
 
