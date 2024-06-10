@@ -76,6 +76,12 @@ class Not(Expr):
         # not `None` if `self.expr` is a `Var`
         return self.expr.atom
 
+    def __repr__(self) -> str:
+        if isinstance(self.expr, (Or, Var)):
+            return f"~{repr(self.expr)}"
+        else:
+            return f"~({repr(self.expr)})"
+
 
 class Var(Expr):
     __slots__ = ("name",)
@@ -86,17 +92,27 @@ class Var(Expr):
     def atom(self) -> Optional[Var]:
         return self
 
+    def __repr__(self) -> str:
+        return self.name
+
 
 class Or(Expr):
     __slots__ = ("args",)
 
     args: Tuple[Expr, ...]
 
+    def __repr__(self) -> str:
+        args_repr = " | ".join(map(repr, self.args))
+        return f"({args_repr})"
+
 
 class And(Expr):
     __slots__ = ("args",)
 
     args: Tuple[Expr, ...]
+
+    def __repr__(self) -> str:
+        return " & ".join(map(repr, self.args))
 
 
 def var(*specs: str, sep: Optional[str] = None) -> Tuple[Var, ...]:

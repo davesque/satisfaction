@@ -57,6 +57,28 @@ class TestExpr:
         assert ((w | ~x) & (y | ~z)).is_cnf
 
 
+class TestNot:
+    def test_repr(self) -> None:
+        assert repr(~x) == "~x"
+        assert repr(~(x | y)) == "~(x | y)"
+        assert repr(~(x & y)) == "~(x & y)"
+
+
+class TestVar:
+    def test_repr(self) -> None:
+        assert repr(x) == "x"
+
+
+class TestOr:
+    def test_repr(self) -> None:
+        assert repr(x | y) == "(x | y)"
+
+
+class TestAnd:
+    def test_repr(self) -> None:
+        assert repr(x & y) == "x & y"
+
+
 def test_var() -> None:
     assert var("w x y z") == (w, x, y, z)
     assert var("w x", "y z") == (w, x, y, z)
