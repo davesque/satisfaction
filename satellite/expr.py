@@ -17,15 +17,13 @@ def format_expr(expr: Expr, parent: Optional[Expr] = None) -> str:
             return f"~{format_expr(sub_expr, expr)}"
 
         case Connective(args):  # type: ignore
-            join_with = cast(str, expr.join_with)
-            precedence = cast(int, expr.precedence)
             try:
-                parent_precedence = cast(int, parent.precedence)  # type: ignore
+                parent_precedence = parent.precedence  # type: ignore
             except AttributeError:
                 parent_precedence = float("inf")
 
-            args_repr = join_with.join(format_expr(a, expr) for a in args)
-            if parent is None or precedence > parent_precedence:
+            args_repr = expr.join_with.join(format_expr(a, expr) for a in args)
+            if parent is None or expr.precedence > parent_precedence:
                 return args_repr
             else:
                 return f"({args_repr})"
@@ -133,8 +131,8 @@ class Var(Expr):
 class Connective(Expr):
     __slots__ = ("args",)
 
-    join_with = None
-    precedence = None
+    join_with: str
+    precedence: int
 
     args: Tuple[Expr, ...]
 
