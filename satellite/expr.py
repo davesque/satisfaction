@@ -43,6 +43,8 @@ def require_expr(old_fn: Callable[[T, Expr], U]) -> Callable[[T, Any], U]:
 
 
 class Expr(SlotClass):
+    __slots__ = ()
+
     def __invert__(self) -> Expr:
         if isinstance(self, Not):
             return self.expr
@@ -72,7 +74,7 @@ class Expr(SlotClass):
             return And(*(self, other))
 
     def __hash__(self) -> int:
-        return hash((type(self),) + tuple(self.__values__))
+        return hash((type(self),) + tuple(self.__values__()))
 
     def __repr__(self) -> str:
         return format_expr(self)
@@ -99,6 +101,7 @@ class Expr(SlotClass):
 
 class Not(Expr):
     __slots__ = ("expr",)
+    __match_args__ = ("expr",)
 
     precedence = 4
 
@@ -112,6 +115,7 @@ class Not(Expr):
 
 class Var(Expr):
     __slots__ = ("name",)
+    __match_args__ = ("name",)
 
     name: str
 
@@ -122,6 +126,7 @@ class Var(Expr):
 
 class Connective(Expr):
     __slots__ = ("args",)
+    __match_args__ = ("args",)
 
     join_with: str
     precedence: int
@@ -133,27 +138,37 @@ class Connective(Expr):
 
 
 class And(Connective):
+    __slots__ = ()
+
     join_with = " & "
     precedence = 3
 
 
 class Or(Connective):
+    __slots__ = ()
+
     join_with = " | "
     precedence = 2
 
 
 class BinOp(Connective):
+    __slots__ = ()
+
     # enforce two args
     def __init__(self, lhs: Expr, rhs: Expr):
         super().__init__(lhs, rhs)
 
 
 class Implies(BinOp):
+    __slots__ = ()
+
     join_with = " -> "
     precedence = 1
 
 
 class Equivalent(BinOp):
+    __slots__ = ()
+
     join_with = " <-> "
     precedence = 0
 
