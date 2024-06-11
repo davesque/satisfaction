@@ -1,11 +1,38 @@
 import pytest
 
-from satellite.expr import And, Not, Or, Var, var
+from satellite.expr import And, Not, Or, Var, var, format_expr, Expr
 
 w = Var("w")
 x = Var("x")
 y = Var("y")
 z = Var("z")
+
+
+@pytest.mark.parametrize(
+    "expr,repr_str",
+    (
+        (x, "x"),
+        (~x, "~x"),
+        (~(x | y), "~(x | y)"),
+        (~(x & y), "~(x & y)"),
+        (x | y | z, "x | y | z"),
+        (x & y & z, "x & y & z"),
+        (x >> y >> z, "(x -> y) -> z"),
+        (x ** y ** z, "x <-> (y <-> z)"),
+        (x | y & z, "x | y & z"),
+        (w | x & y | z, "w | x & y | z"),
+        ((w | x) & (y | z), "(w | x) & (y | z)"),
+        ((w & x) | (y & z), "w & x | y & z"),
+        (w & x >> y, "w & (x -> y)"),
+    ),
+)
+def test_format_expr(expr: Expr, repr_str: str) -> None:
+    assert format_expr(expr) == repr_str
+
+
+def test_format_expr_raises() -> None:
+    with pytest.raises(ValueError):
+        format_expr(1)  # type: ignore
 
 
 class TestExpr:
@@ -60,28 +87,6 @@ class TestExpr:
         assert ((w | x) & (y | z)).is_cnf
         assert ((w | ~x) & (y | z)).is_cnf
         assert ((w | ~x) & (y | ~z)).is_cnf
-
-
-class TestNot:
-    def test_repr(self) -> None:
-        assert repr(~x) == "~x"
-        assert repr(~(x | y)) == "~(x | y)"
-        assert repr(~(x & y)) == "~(x & y)"
-
-
-class TestVar:
-    def test_repr(self) -> None:
-        assert repr(x) == "x"
-
-
-class TestOr:
-    def test_repr(self) -> None:
-        assert repr(x | y) == "(x | y)"
-
-
-class TestAnd:
-    def test_repr(self) -> None:
-        assert repr(x & y) == "x & y"
 
 
 def test_var() -> None:

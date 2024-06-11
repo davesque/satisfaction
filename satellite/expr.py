@@ -157,12 +157,12 @@ class BinOp(Connective):
 
 
 class Implies(BinOp):
-    join_with = " => "
+    join_with = " -> "
     precedence = 1
 
 
 class Equivalent(BinOp):
-    join_with = " <=> "
+    join_with = " <-> "
     precedence = 0
 
 
