@@ -59,7 +59,7 @@ class TestSlotClass:
     def test_meta_keys(self) -> None:
         assert Inherited.__keys__ == ("foo", "bar", "bing")
 
-    def test_meta_no_dict_classes(self) -> None:
+    def test_meta_no_multiple_inheritance(self) -> None:
         with pytest.raises(TypeError):
             class Foo(NoSlot, NotSlotsClass):
                 pass
