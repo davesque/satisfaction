@@ -1,7 +1,11 @@
 from __future__ import annotations
-from typing import Any, Optional, Tuple, cast
+import functools
+from typing import Any, Callable, Optional, Tuple, TypeVar, cast
 
 from satellite.utils import SlotClass
+
+T = TypeVar("T", bound="Expr")
+U = TypeVar("U", bound="Expr")
 
 
 def format_expr(expr: Expr, parent: Optional[Expr] = None) -> str:
@@ -29,6 +33,17 @@ def format_expr(expr: Expr, parent: Optional[Expr] = None) -> str:
     raise ValueError(f"unsupported value: {expr}")
 
 
+def require_expr(old_fn: Callable[[T, Any], U]) -> Callable[[T, Any], U]:
+    @functools.wraps(old_fn)
+    def new_fn(self: T, other: Any) -> U:
+        if not isinstance(other, Expr):
+            raise TypeError(f"cannot combine expr and non-expr")
+
+        return old_fn(self, other)
+
+    return new_fn
+
+
 class Expr(SlotClass):
     def __invert__(self) -> Expr:
         if isinstance(self, Not):
@@ -36,10 +51,8 @@ class Expr(SlotClass):
         else:
             return Not(self)
 
+    @require_expr
     def __or__(self, other: Any) -> Or:
-        if not isinstance(other, Expr):
-            raise ValueError(f"cannot disjoin with non-expression")
-
         if isinstance(self, Or) and isinstance(other, Or):
             return Or(*(self.args + other.args))
         elif isinstance(self, Or):
@@ -49,13 +62,8 @@ class Expr(SlotClass):
         else:
             return Or(*(self, other))
 
-    def __ror__(self, _: Any) -> None:
-        raise ValueError(f"cannot disjoin with non-expression")
-
+    @require_expr
     def __and__(self, other: Any) -> And:
-        if not isinstance(other, Expr):
-            raise ValueError(f"cannot conjoin with non-expression")
-
         if isinstance(self, And) and isinstance(other, And):
             return And(*(self.args + other.args))
         elif isinstance(self, And):
@@ -64,9 +72,6 @@ class Expr(SlotClass):
             return And(*((self,) + other.args))
         else:
             return And(*(self, other))
-
-    def __rand__(self, _: Any) -> None:
-        raise ValueError(f"cannot conjoin with non-expression")
 
     def __hash__(self) -> int:
         return hash((type(self),) + tuple(self.__values__))

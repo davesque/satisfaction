@@ -14,9 +14,9 @@ class TestExpr:
         assert ~(~x) == x
 
     def test_or_raises(self) -> None:
-        with pytest.raises(ValueError, match="cannot disjoin"):
+        with pytest.raises(TypeError, match="cannot combine"):
             _ = x | 1
-        with pytest.raises(ValueError, match="cannot disjoin"):
+        with pytest.raises(TypeError, match="unsupported operand"):
             _ = 1 | x
 
     def test_or(self) -> None:
@@ -26,9 +26,9 @@ class TestExpr:
         assert (w | x) | (y | z) == Or(w, x, y, z)
 
     def test_and_raises(self) -> None:
-        with pytest.raises(ValueError, match="cannot conjoin"):
+        with pytest.raises(TypeError, match="cannot combine"):
             _ = x & 1
-        with pytest.raises(ValueError, match="cannot conjoin"):
+        with pytest.raises(TypeError, match="unsupported operand"):
             _ = 1 & x
 
     def test_and(self) -> None:
