@@ -1,8 +1,32 @@
 from __future__ import annotations
-
-from typing import Any, Tuple, Optional
+from typing import Any, Optional, Tuple, cast
 
 from satellite.utils import SlotClass
+
+
+def format_expr(expr: Expr, parent: Optional[Expr] = None) -> str:
+    match expr:
+        case Var(name):  # type: ignore
+            return name
+
+        case Not(sub_expr):  # type: ignore
+            return f"~{format_expr(sub_expr, expr)}"
+
+        case Connective(args):  # type: ignore
+            join_with = cast(str, expr.join_with)
+            precedence = cast(int, expr.precedence)
+            try:
+                parent_precedence = cast(int, parent.precedence)  # type: ignore
+            except AttributeError:
+                parent_precedence = float("inf")
+
+            args_repr = join_with.join(format_expr(a, expr) for a in args)
+            if parent is None or precedence > parent_precedence:
+                return args_repr
+            else:
+                return f"({args_repr})"
+
+    raise ValueError(f"unsupported value: {expr}")
 
 
 class Expr(SlotClass):
@@ -47,6 +71,9 @@ class Expr(SlotClass):
     def __hash__(self) -> int:
         return hash((type(self),) + tuple(self.__values__))
 
+    def __repr__(self) -> str:
+        return format_expr(self)
+
     @property
     def atom(self) -> Optional[Var]:
         return None
@@ -70,18 +97,14 @@ class Expr(SlotClass):
 class Not(Expr):
     __slots__ = ("expr",)
 
+    precedence = 4
+
     expr: Expr
 
     @property
     def atom(self) -> Optional[Var]:
         # not `None` if `self.expr` is a `Var`
         return self.expr.atom
-
-    def __repr__(self) -> str:
-        if isinstance(self.expr, (Or, Var)):
-            return f"~{repr(self.expr)}"
-        else:
-            return f"~({repr(self.expr)})"
 
 
 class Var(Expr):
@@ -93,12 +116,12 @@ class Var(Expr):
     def atom(self) -> Optional[Var]:
         return self
 
-    def __repr__(self) -> str:
-        return self.name
-
 
 class Connective(Expr):
     __slots__ = ("args",)
+
+    join_with = None
+    precedence = None
 
     args: Tuple[Expr, ...]
 
@@ -106,15 +129,14 @@ class Connective(Expr):
         super().__init__(args)
 
 
-class Or(Connective):
-    def __repr__(self) -> str:
-        args_repr = " | ".join(map(repr, self.args))
-        return f"({args_repr})"
-
-
 class And(Connective):
-    def __repr__(self) -> str:
-        return " & ".join(map(repr, self.args))
+    join_with = " & "
+    precedence = 3
+
+
+class Or(Connective):
+    join_with = " | "
+    precedence = 2
 
 
 def var(*specs: str, sep: Optional[str] = None) -> Tuple[Var, ...]:
