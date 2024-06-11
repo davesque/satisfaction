@@ -8,9 +8,10 @@ def _get_mro_slots(mro: Tuple[Type[Any], ...]) -> Iterator[str]:
             continue
 
         # We know that we must have slots here since the metaclass disables
-        # multiple inheritance and at least sets an empty "__slots__" attr on
-        # all subclasses.  So there's no way for a class to be introduced into
-        # the mro that is not the base `object` built-in.
+        # multiple inheritance and sets an empty "__slots__" attr on all
+        # subclasses by default.  So there's no way for a class to be
+        # introduced into the mro (other than the base `object` built-in) that
+        # doesn't have a "__slots__" attr.
         yield from cls.__slots__
 
 
