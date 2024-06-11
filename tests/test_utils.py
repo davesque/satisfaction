@@ -32,7 +32,38 @@ class Nested(utils.SlotClass):
     nested: TwoSlot
 
 
+class NotSlotsClass:
+    pass
+
+
+class NoSlot(TwoSlot):
+    pass
+
+
 class TestSlotClass:
+    def test_meta_default_slots(self) -> None:
+        no_slot = NoSlot(1, 2)
+        with pytest.raises(AttributeError):
+            _ = no_slot.x  # type: ignore
+        with pytest.raises(AttributeError):
+            no_slot.x = 1  # type: ignore
+        with pytest.raises(AttributeError):
+            _ = no_slot.__dict__
+
+    def test_meta_match_args(self) -> None:
+        two_slot = TwoSlot(1, 2)
+        match two_slot:
+            case TwoSlot(x, y):  # type: ignore
+                assert (x, y) == (1, 2)
+
+    def test_meta_keys(self) -> None:
+        assert Inherited.__keys__ == ("foo", "bar", "bing")
+
+    def test_meta_no_dict_classes(self) -> None:
+        with pytest.raises(TypeError):
+            class Foo(NoSlot, NotSlotsClass):
+                pass
+
     def test_class(self) -> None:
         for one in (OneSlot(1), OneSlot(foo=1)):
             assert one.foo == 1
@@ -59,12 +90,9 @@ class TestSlotClass:
         with pytest.raises(TypeError, match="requires a setting for"):
             should_throw_error()
 
-    def test_class_keys(self) -> None:
-        assert tuple(Inherited.__keys__()) == ("foo", "bar", "bing")
-
     def test_class_values(self) -> None:
         inherited = Inherited(1, 2, 3)
-        assert tuple(inherited.__values__()) == (1, 2, 3)
+        assert tuple(inherited.__values__) == (1, 2, 3)
 
     def test_class_repr(self) -> None:
         nested = Nested("val", TwoSlot("foo", "bar"))

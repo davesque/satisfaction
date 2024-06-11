@@ -6,8 +6,6 @@ from satellite.utils import SlotClass
 
 
 class Expr(SlotClass):
-    __slots__ = ()
-
     def __invert__(self) -> Expr:
         if isinstance(self, Not):
             return self.expr
@@ -47,7 +45,7 @@ class Expr(SlotClass):
         raise ValueError(f"cannot conjoin with non-expression")
 
     def __hash__(self) -> int:
-        return hash((type(self),) + tuple(self.__values__()))
+        return hash((type(self),) + tuple(self.__values__))
 
     @property
     def atom(self) -> Optional[Var]:
