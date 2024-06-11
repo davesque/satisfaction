@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Set
+from typing import Dict, Iterator, List, Optional, Set
 
 from satellite.expr import And, Connective, Equivalent, Expr, Implies, Not, Or, Var
 
@@ -29,21 +29,46 @@ def letters() -> Iterator[str]:
         letter_carry(places)
 
 
+def numbered_var(name: str, n: int) -> Iterator[str]:
+    i = n
+    while True:
+        yield f"{name}{i}"
+        i += 1
+
+
 class Tseitin:
-    __slots__ = ("expr", "equivalences", "renames", "name_gen", "root")
+    __slots__ = (
+        "expr",
+        "rename_vars",
+        "name_gen",
+        "equivalences",
+        "renames",
+        "root",
+    )
 
     expr: Expr
+    rename_vars: bool
+    name_gen: Iterator[str]
+
     equivalences: Set[Equivalent]
     renames: Dict[Var, Var]
-    name_gen: Iterator[str]
     root: Expr
 
-    def __init__(self, expr: Expr) -> None:
+    def __init__(
+        self,
+        expr: Expr,
+        rename_vars: bool = True,
+        name_gen: Optional[Iterator[str]] = None,
+    ) -> None:
+        if name_gen is None:
+            name_gen = letters()
+
         self.expr = expr
+        self.rename_vars = rename_vars
+        self.name_gen = name_gen
+
         self.equivalences = set()
         self.renames = {}
-        self.name_gen = letters()
-
         self.root = self.rewrite(expr)
 
     def new_var(self) -> Var:
@@ -60,10 +85,10 @@ class Tseitin:
     def rewrite(self, expr: Expr) -> Expr:
         match expr:
             case Var(_):
-                return self.lookup(expr)
+                return self.lookup(expr) if self.rename_vars else expr
 
             case Not(Var(_) as var):
-                return Not(self.lookup(var))
+                return Not(self.lookup(var)) if self.rename_vars else expr
 
             case Not(p):
                 lhs = self.new_var()
@@ -90,7 +115,7 @@ class Tseitin:
     @staticmethod
     def equiv_to_cnf(equiv: Equivalent) -> And:
         """
-        Convert an equivalence to a CNF clause.
+        Convert an equivalence to CNF.
 
         Each of these match cases should work regardless of the polarity of
         right-hand side literals.
