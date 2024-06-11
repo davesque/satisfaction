@@ -92,36 +92,36 @@ class Tseitin:
         """
         Convert an equivalence to a CNF clause.
 
-        Each of these match cases should work regardless of whether or not the
-        right-hand side literals are positive or negative polarity.
+        Each of these match cases should work regardless of the polarity of
+        right-hand side literals.
         """
         match equiv:
-            case Equivalent((a, Not(b))):
-                # a <-> ~b
-                # = (a -> ~b) & (~b -> a)
-                # = (~a | ~b) & (b | a)
-                return (~a | ~b) & (b | a)
+            case Equivalent((p, Not(q))):
+                # p <-> ~q
+                # = (p -> ~q) & (~q -> p)
+                # = (~p | ~q) & (q | p)
+                return (~p | ~q) & (q | p)
 
-            case Equivalent((a, Implies((b, c)))):
-                # a <-> (b -> c)
-                # = (~a | (b -> c)) & (~(b -> c) | a)
-                # = (~a | (~b | c)) & (~(~b | c) | a)
-                # = (~a | ~b | c) & (b & ~c | a)
-                # = (~a | ~b | c) & (b | a) & (~c | a)
-                return (~a | ~b | c) & (b | a) & (~c | a)
+            case Equivalent((p, Implies((q, r)))):
+                # p <-> (q -> r)
+                # = (~p | (q -> r)) & (~(q -> r) | p)
+                # = (~p | (~q | r)) & (~(~q | r) | p)
+                # = (~p | ~q | r) & (q & ~r | p)
+                # = (~p | ~q | r) & (q | p) & (~r | p)
+                return (~p | ~q | r) & (q | p) & (~r | p)
 
-            case Equivalent((a, Or((b, c)))):
-                # a <-> (b | c)
-                # = (~a | (b | c)) & (~(b | c) | a)
-                # = (~a | b | c) & (~b & ~c | a)
-                # = (~a | b | c) & (~b | a) & (~c | a)
-                return (~a | b | c) & (~b | a) & (~c | a)
+            case Equivalent((p, Or((q, r)))):
+                # p <-> (q | r)
+                # = (~p | (q | r)) & (~(q | r) | p)
+                # = (~p | q | r) & (~q & ~r | p)
+                # = (~p | q | r) & (~q | p) & (~r | p)
+                return (~p | q | r) & (~q | p) & (~r | p)
 
-            case Equivalent((a, And((b, c)))):
-                # a <-> (b & c)
-                # = (~a | (b & c)) & (~(b & c) | a)
-                # = (~a | b) & (~a | c) & (~b | ~c | a)
-                return (~a | b) & (~a | c) & (~b | ~c | a)
+            case Equivalent((p, And((q, r)))):
+                # p <-> (q & r)
+                # = (~p | (q & r)) & (~(q & r) | p)
+                # = (~p | q) & (~p | r) & (~q | ~r | p)
+                return (~p | q) & (~p | r) & (~q | ~r | p)
 
         assert False
 
