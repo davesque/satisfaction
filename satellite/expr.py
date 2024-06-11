@@ -73,6 +73,14 @@ class Expr(SlotClass):
         else:
             return And(*(self, other))
 
+    @require_expr
+    def __rshift__(self, other: Expr) -> Implies:
+        return Implies(self, other)
+
+    @require_expr
+    def __pow__(self, other: Expr) -> Equivalent:
+        return Equivalent(self, other)
+
     def __hash__(self) -> int:
         return hash((type(self),) + tuple(self.__values__))
 
@@ -142,6 +150,22 @@ class And(Connective):
 class Or(Connective):
     join_with = " | "
     precedence = 2
+
+
+class BinOp(Connective):
+    # enforce two args
+    def __init__(self, lhs: Expr, rhs: Expr):
+        super().__init__(lhs, rhs)
+
+
+class Implies(BinOp):
+    join_with = " => "
+    precedence = 1
+
+
+class Equivalent(BinOp):
+    join_with = " <=> "
+    precedence = 0
 
 
 def var(*specs: str, sep: Optional[str] = None) -> Tuple[Var, ...]:
