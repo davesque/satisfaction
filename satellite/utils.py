@@ -2,16 +2,16 @@ from textwrap import indent
 from typing import Any, Iterator, Tuple, Type
 
 
-def get_mro_slots(mro: Tuple[Type[Any], ...]) -> Iterator[str]:
+def _get_mro_slots(mro: Tuple[Type[Any], ...]) -> Iterator[str]:
     for cls in reversed(mro):
         if cls is object:
             continue
-        try:
-            yield from cls.__slots__
-        except AttributeError as e:
-            raise TypeError(
-                f"found class without slots in mro: {cls.__qualname__}"
-            ) from e
+
+        # We know that we must have slots here since the metaclass disables
+        # multiple inheritance and at least sets an empty "__slots__" attr on
+        # all subclasses.  So there's no way for a class to be introduced into
+        # the mro that is not the base `object` built-in.
+        yield from cls.__slots__
 
 
 class SlotMeta(type):
@@ -24,7 +24,7 @@ class SlotMeta(type):
             raise TypeError("multiple inheritance not supported")
 
         slots = attrs.setdefault("__slots__", ())
-        mro_slots = tuple(get_mro_slots(bases[0].__mro__)) if len(bases) == 1 else ()
+        mro_slots = tuple(_get_mro_slots(bases[0].__mro__)) if len(bases) == 1 else ()
         all_slots = mro_slots + slots
 
         attrs.setdefault("__match_args__", all_slots)
