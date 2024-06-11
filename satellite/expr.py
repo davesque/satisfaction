@@ -33,7 +33,7 @@ def format_expr(expr: Expr, parent: Optional[Expr] = None) -> str:
     raise ValueError(f"unsupported value: {expr}")
 
 
-def require_expr(old_fn: Callable[[T, Any], U]) -> Callable[[T, Any], U]:
+def require_expr(old_fn: Callable[[T, Expr], U]) -> Callable[[T, Any], U]:
     @functools.wraps(old_fn)
     def new_fn(self: T, other: Any) -> U:
         if not isinstance(other, Expr):
@@ -52,7 +52,7 @@ class Expr(SlotClass):
             return Not(self)
 
     @require_expr
-    def __or__(self, other: Any) -> Or:
+    def __or__(self, other: Expr) -> Or:
         if isinstance(self, Or) and isinstance(other, Or):
             return Or(*(self.args + other.args))
         elif isinstance(self, Or):
@@ -63,7 +63,7 @@ class Expr(SlotClass):
             return Or(*(self, other))
 
     @require_expr
-    def __and__(self, other: Any) -> And:
+    def __and__(self, other: Expr) -> And:
         if isinstance(self, And) and isinstance(other, And):
             return And(*(self.args + other.args))
         elif isinstance(self, And):
