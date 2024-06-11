@@ -4,6 +4,8 @@ from typing import Any, Iterator, Tuple, Type
 
 def get_mro_slots(mro: Tuple[Type[Any], ...]) -> Iterator[str]:
     for cls in reversed(mro):
+        if cls is object:
+            continue
         try:
             yield from cls.__slots__
         except AttributeError as e:
@@ -14,8 +16,16 @@ def get_mro_slots(mro: Tuple[Type[Any], ...]) -> Iterator[str]:
 
 class SlotMeta(type):
     def __new__(cls, name, bases, attrs):
+        if len(bases) > 1:
+            # I'm doing this because I don't feel like figuring out how to get
+            # mro slots from multiple base classes.  Multiple inheritance also
+            # kinda doesn't really work with slots anyway.  See here:
+            # https://docs.python.org/3/reference/datamodel.html#object.__slots__
+            raise TypeError("multiple inheritance not supported")
+
         slots = attrs.setdefault("__slots__", ())
-        all_slots = tuple(get_mro_slots(bases)) + slots
+        mro_slots = tuple(get_mro_slots(bases[0].__mro__)) if len(bases) == 1 else ()
+        all_slots = mro_slots + slots
 
         attrs.setdefault("__match_args__", all_slots)
         attrs.setdefault("__keys__", all_slots)
