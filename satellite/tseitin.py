@@ -1,6 +1,6 @@
 from typing import Dict, Iterator, List, Set
 
-from satellite.expr import And, Connective, Equivalent, Expr, Not, Or, Var
+from satellite.expr import And, Connective, Equivalent, Expr, Implies, Not, Or, Var
 
 
 ord_a = ord("a")
@@ -30,17 +30,17 @@ def letters() -> Iterator[str]:
 
 
 class Tseitin:
-    __slots__ = ("expr", "clauses", "renames", "name_gen", "root")
+    __slots__ = ("expr", "equivalences", "renames", "name_gen", "root")
 
     expr: Expr
-    clauses: Set[Equivalent]
+    equivalences: Set[Equivalent]
     renames: Dict[Var, Var]
     name_gen: Iterator[str]
     root: Expr
 
     def __init__(self, expr: Expr) -> None:
         self.expr = expr
-        self.clauses = set()
+        self.equivalences = set()
         self.renames = {}
         self.name_gen = letters()
 
@@ -84,5 +84,51 @@ class Tseitin:
             case _:
                 assert False
 
-        self.clauses.add(Equivalent(lhs, rhs))
+        self.equivalences.add(Equivalent(lhs, rhs))
         return lhs
+
+    @staticmethod
+    def equiv_to_cnf(equiv: Equivalent) -> And:
+        """
+        Convert an equivalence to a CNF clause.
+
+        Each of these match cases should work regardless of whether or not the
+        right-hand side literals are positive or negative polarity.
+        """
+        match equiv:
+            case Equivalent((a, Not(b))):
+                # a <-> ~b
+                # = (a -> ~b) & (~b -> a)
+                # = (~a | ~b) & (b | a)
+                return (~a | ~b) & (b | a)
+
+            case Equivalent((a, Implies((b, c)))):
+                # a <-> (b -> c)
+                # = (~a | (b -> c)) & (~(b -> c) | a)
+                # = (~a | (~b | c)) & (~(~b | c) | a)
+                # = (~a | ~b | c) & (b & ~c | a)
+                # = (~a | ~b | c) & (b | a) & (~c | a)
+                return (~a | ~b | c) & (b | a) & (~c | a)
+
+            case Equivalent((a, Or((b, c)))):
+                # a <-> (b | c)
+                # = (~a | (b | c)) & (~(b | c) | a)
+                # = (~a | b | c) & (~b & ~c | a)
+                # = (~a | b | c) & (~b | a) & (~c | a)
+                return (~a | b | c) & (~b | a) & (~c | a)
+
+            case Equivalent((a, And((b, c)))):
+                # a <-> (b & c)
+                # = (~a | (b & c)) & (~(b & c) | a)
+                # = (~a | b) & (~a | c) & (~b | ~c | a)
+                return (~a | b) & (~a | c) & (~b | ~c | a)
+
+        assert False
+
+    def transform(self) -> And:
+        parts: List[Expr] = [Or(self.root)]
+        for equiv in self.equivalences:
+            and_expr = self.equiv_to_cnf(equiv)
+            parts.extend(and_expr.args)
+
+        return And(*parts)
