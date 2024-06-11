@@ -1,6 +1,16 @@
 import pytest
 
-from satellite.expr import And, Not, Or, Var, var, format_expr, Expr
+from satellite.expr import (
+    And,
+    Expr,
+    Not,
+    Or,
+    Var,
+    format_expr,
+    var,
+    Implies,
+    Equivalent,
+)
 
 w = Var("w")
 x = Var("x")
@@ -17,13 +27,13 @@ z = Var("z")
         (~(x & y), "~(x & y)"),
         (x | y | z, "x | y | z"),
         (x & y & z, "x & y & z"),
-        (x >> y >> z, "(x -> y) -> z"),
-        (x ** y ** z, "x <-> (y <-> z)"),
+        (Implies(x, y), "x -> y"),
+        (Equivalent(x, y), "x <-> y"),
         (x | y & z, "x | y & z"),
         (w | x & y | z, "w | x & y | z"),
         ((w | x) & (y | z), "(w | x) & (y | z)"),
         ((w & x) | (y & z), "w & x | y & z"),
-        (w & x >> y, "w & (x -> y)"),
+        (Implies(w & x, y), "w & x -> y"),
     ),
 )
 def test_format_expr(expr: Expr, repr_str: str) -> None:
@@ -44,7 +54,7 @@ class TestExpr:
         with pytest.raises(TypeError, match="cannot combine"):
             _ = x | 1
         with pytest.raises(TypeError, match="unsupported operand"):
-            _ = 1 | x
+            _ = 1 | x  # type: ignore
 
     def test_or(self) -> None:
         assert x | y == Or(x, y)
@@ -56,7 +66,7 @@ class TestExpr:
         with pytest.raises(TypeError, match="cannot combine"):
             _ = x & 1
         with pytest.raises(TypeError, match="unsupported operand"):
-            _ = 1 & x
+            _ = 1 & x  # type: ignore
 
     def test_and(self) -> None:
         assert x & y == And(x, y)

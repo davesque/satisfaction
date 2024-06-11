@@ -1,6 +1,6 @@
 from __future__ import annotations
 import functools
-from typing import Any, Callable, Optional, Tuple, TypeVar, cast
+from typing import Any, Callable, Optional, Tuple, TypeVar
 
 from satellite.utils import SlotClass
 
@@ -70,14 +70,6 @@ class Expr(SlotClass):
             return And(*((self,) + other.args))
         else:
             return And(*(self, other))
-
-    @require_expr
-    def __rshift__(self, other: Expr) -> Implies:
-        return Implies(self, other)
-
-    @require_expr
-    def __pow__(self, other: Expr) -> Equivalent:
-        return Equivalent(self, other)
 
     def __hash__(self) -> int:
         return hash((type(self),) + tuple(self.__values__))
