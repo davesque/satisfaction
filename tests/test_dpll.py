@@ -10,6 +10,7 @@ from satellite.dpll import (
 from satellite.examples.queens import Queens
 from satellite.expr import And, Or, var
 from satellite.tseitin import Tseitin
+from satellite.utils import numbered_var
 
 w, x, y, z = var("w x y z")
 
@@ -69,7 +70,7 @@ def test_queens() -> None:
 
     queens_formula = queens.get_formula()
 
-    tseitin = Tseitin(queens_formula)
-    queens_cnf = tseitin.transform()
+    tseitin = Tseitin(queens_formula, rename_vars=False, name_gen=numbered_var("x", 0))
+    queens_cnf = tseitin.transform(sort=True)
 
     assert not dpll(queens_cnf)

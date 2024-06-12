@@ -1,10 +1,31 @@
 from collections import defaultdict
 import logging
-from typing import Callable, Optional, Set, cast
+import random
+from typing import Callable, Dict, Optional, Set, cast
 
-from satellite.expr import And, CNF, Expr, Literal, Or
+from satellite.expr import And, CNF, Connective, Expr, Literal, Not, Or, Var
 
 logger = logging.getLogger(__name__)
+
+
+def count_lits(expr: Expr, counter: Dict[Var, int]) -> None:
+    match expr:
+        case Var(_):
+            # if name.startswith("x"):
+            counter[expr] += 1
+        case Not(p):
+            count_lits(p, counter)
+        case Connective(args):
+            for arg in args:
+                count_lits(arg, counter)
+
+
+def common_lit(expr: CNF) -> Literal:
+    counter = defaultdict(lambda: 0)
+    count_lits(expr, counter)
+
+    counts = sorted(counter.items(), key=lambda i: i[1], reverse=True)
+    return counts[0][0]
 
 
 def first_lit(expr: CNF) -> Literal:
@@ -12,7 +33,18 @@ def first_lit(expr: CNF) -> Literal:
     return or_expr.args[0]
 
 
-def dpll(expr: CNF, choose_lit: Callable[[CNF], Literal] = first_lit) -> bool:
+def last_lit(expr: CNF) -> Literal:
+    or_expr = cast(Or, expr.args[-1])
+    return or_expr.args[-1]
+
+
+def random_lit(expr: CNF) -> Literal:
+    or_expr = cast(Or, random.choice(expr.args))
+    lit = random.choice(or_expr.args)
+    return lit
+
+
+def dpll(expr: CNF, choose_lit: Callable[[CNF], Literal] = common_lit) -> bool:
     """
     The Davis-Putnam-Logemann-Loveland (DPLL) SAT algorithm.
 
