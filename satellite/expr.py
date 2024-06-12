@@ -22,6 +22,8 @@ def require_expr(old_fn: Callable[[T, Expr], U]) -> Callable[[T, Any], U]:
 class Expr(SlotClass):
     __slots__ = ()
 
+    precedence = float("inf")
+
     def __invert__(self) -> Expr:
         if isinstance(self, Not):
             return self.expr
@@ -55,6 +57,7 @@ class Expr(SlotClass):
 
     def __repr__(self) -> str:
         from satellite.format import format_expr
+
         return format_expr(self)
 
     @property
@@ -106,7 +109,6 @@ class Connective(Expr):
     __slots__ = ("args",)
     __match_args__ = ("args",)
 
-    join_with: str
     precedence: int
 
     args: Tuple[Expr, ...]
@@ -117,15 +119,11 @@ class Connective(Expr):
 
 class And(Connective):
     __slots__ = ()
-
-    join_with = " & "
     precedence = 3
 
 
 class Or(Connective):
     __slots__ = ()
-
-    join_with = " | "
     precedence = 2
 
 
@@ -139,15 +137,11 @@ class BinOp(Connective):
 
 class Implies(BinOp):
     __slots__ = ()
-
-    join_with = " -> "
     precedence = 1
 
 
 class Equivalent(BinOp):
     __slots__ = ()
-
-    join_with = " <-> "
     precedence = 0
 
 
