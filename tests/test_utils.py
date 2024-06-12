@@ -6,6 +6,16 @@ import pytest
 from satellite import utils
 
 
+def test_chunks() -> None:
+    gen = utils.chunks(range(10), 3)
+    assert list(gen) == [
+        (0, 1, 2),
+        (3, 4, 5),
+        (6, 7, 8),
+        (9,),
+    ]
+
+
 class TestPlaces:
     def test_slots(self) -> None:
         places = utils.Places(2)

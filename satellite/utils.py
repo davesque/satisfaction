@@ -1,5 +1,19 @@
 from textwrap import indent
-from typing import Any, Iterator, List
+from typing import Any, Iterable, Iterator, List, Tuple, TypeVar
+
+T = TypeVar("T")
+
+
+def chunks(iter: Iterable[T], n: int) -> Iterator[Tuple[T, ...]]:
+    chunk = []
+    for el in iter:
+        chunk.append(el)
+        if len(chunk) == n:
+            yield tuple(chunk)
+            chunk = []
+
+    if len(chunk) > 0:
+        yield tuple(chunk)
 
 
 class Places(list):
