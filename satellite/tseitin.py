@@ -118,9 +118,15 @@ class Tseitin:
 
         assert False
 
-    def transform(self) -> And:
+    def transform(self, sort: bool = False) -> And:
+        if sort:
+            equivalences = list(self.equivalences)
+            equivalences.sort(key=lambda equiv: equiv.lhs.name)
+        else:
+            equivalences = self.equivalences
+
         parts: List[Expr] = [Or(self.root)]
-        for equiv in self.equivalences:
+        for equiv in equivalences:
             and_expr = self.equiv_to_cnf(equiv)
             parts.extend(and_expr.args)
 
