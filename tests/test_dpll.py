@@ -11,7 +11,8 @@ from satellite.dpll import (
     unit_propagate,
 )
 from satellite.expr import And, Or, Var, var
-from satellite.tseitin import Tseitin, numbered_var
+from satellite.tseitin import Tseitin
+from satellite.utils import numbered_var
 
 w, x, y, z = var("w x y z")
 

@@ -1,39 +1,7 @@
 from typing import Dict, Iterator, List, Optional, Set
 
 from satellite.expr import And, Connective, Equivalent, Expr, Implies, Not, Or, Var
-
-
-ord_a = ord("a")
-
-
-def letter_carry(places: List[int]) -> None:
-    i = 0
-    while True:
-        if places[i] < 26:
-            break
-
-        places[i] = 0
-        if len(places) == i + 1:
-            places.append(0)
-        else:
-            places[i + 1] += 1
-
-        i += 1
-
-
-def letters() -> Iterator[str]:
-    places = [0]
-    while True:
-        yield "".join(chr(ord_a + p) for p in reversed(places))
-        places[0] += 1
-        letter_carry(places)
-
-
-def numbered_var(name: str, n: int) -> Iterator[str]:
-    i = n
-    while True:
-        yield f"{name}{i}"
-        i += 1
+from satellite.utils import letters
 
 
 class Tseitin:
