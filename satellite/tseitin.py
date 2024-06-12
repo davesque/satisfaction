@@ -1,6 +1,6 @@
 from typing import Dict, Iterator, List, Optional, Set
 
-from satellite.expr import And, Connective, Equivalent, Expr, Implies, Not, Or, Var
+from satellite.expr import And, Connective, Equivalent, Expr, Implies, Not, Or, Var, CNF, Literal
 from satellite.utils import letters
 
 
@@ -50,7 +50,7 @@ class Tseitin:
             self.renames[orig_var] = new_var
             return new_var
 
-    def rewrite(self, expr: Expr) -> Expr:
+    def rewrite(self, expr: Expr) -> Literal:
         match expr:
             case Var(_):
                 return self.lookup(expr) if self.rename_vars else expr
@@ -81,7 +81,7 @@ class Tseitin:
         return lhs
 
     @staticmethod
-    def equiv_to_cnf(equiv: Equivalent) -> And:
+    def equiv_to_cnf(equiv: Equivalent[Var, Expr]) -> CNF:
         """
         Convert an equivalence to CNF.
 
@@ -118,7 +118,7 @@ class Tseitin:
 
         assert False
 
-    def transform(self, sort: bool = False) -> And:
+    def transform(self, sort: bool = False) -> CNF:
         if sort:
             equivalences = list(self.equivalences)
             equivalences.sort(key=lambda equiv: equiv.lhs.name)

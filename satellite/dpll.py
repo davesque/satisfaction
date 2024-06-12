@@ -1,10 +1,15 @@
 from collections import defaultdict
-from typing import Optional, Set, cast
+from typing import Callable, Optional, Set, cast
 
-from satellite.expr import And, Expr, Or
+from satellite.expr import And, CNF, Expr, Literal, Or
 
 
-def dpll(expr: And) -> bool:
+def first_lit(expr: CNF) -> Literal:
+    or_expr = cast(Or, expr.args[0])
+    return or_expr.args[0]
+
+
+def dpll(expr: CNF, choose_lit: Callable[[CNF], Literal] = first_lit) -> bool:
     """
     The Davis-Putnam-Logemann-Loveland (DPLL) SAT algorithm.
 
@@ -31,38 +36,26 @@ def dpll(expr: And) -> bool:
     # `false`.  Therefore, the parent disjunction evaluates to `false` and the
     # root conjunction also evaluate to `false`.
     for or_expr in expr.args:
-        assert isinstance(or_expr, Or)
-
         if len(or_expr.args) == 0:
             return False
 
-    first_or = cast(Or, expr.args[0])
-    lit = first_or.args[0]
+    lit = choose_lit(expr)
 
-    return dpll(unit_propagate(lit, expr)) or dpll(unit_propagate(~lit, expr))
+    if dpll(unit_propagate(lit, expr), choose_lit):
+        return True
+    return dpll(unit_propagate(~lit, expr), choose_lit)
 
 
-def find_unit(and_expr: And) -> Optional[Expr]:
-    assert isinstance(and_expr, And)
-
+def find_unit(and_expr: CNF) -> Optional[Expr]:
     for or_expr in and_expr.args:
-        assert isinstance(or_expr, Or)
-
         if len(or_expr.args) == 1:
-            lit = or_expr.args[0]
-
-            assert lit.atom is not None
-            return lit
+            return or_expr.args[0]
 
 
-def unit_propagate(lit: Expr, and_expr: And) -> And:
-    assert isinstance(and_expr, And)
-
+def unit_propagate(lit: Expr, and_expr: CNF) -> CNF:
     not_lit = ~lit
     and_args = []
     for or_expr in and_expr.args:
-        assert isinstance(or_expr, Or)
-
         delete = False
         or_args = []
         for or_lit in or_expr.args:
@@ -83,30 +76,20 @@ def unit_propagate(lit: Expr, and_expr: And) -> And:
     return And(*and_args)
 
 
-def find_pure(and_expr: And) -> Set[Expr]:
-    assert isinstance(and_expr, And)
-
+def find_pure(and_expr: CNF) -> Set[Expr]:
     lit_variants = defaultdict(set)
     for or_expr in and_expr.args:
-        assert isinstance(or_expr, Or)
-
         for or_lit in or_expr.args:
             atom = or_lit.atom
-            assert atom is not None
-
             lit_variants[atom].add(or_lit)
 
     pure_lits = {tuple(v)[0] for v in lit_variants.values() if len(v) == 1}
     return pure_lits
 
 
-def pure_literal_assign(lit: Expr, and_expr: And) -> And:
-    assert isinstance(and_expr, And)
-
+def pure_literal_assign(lit: Expr, and_expr: CNF) -> CNF:
     and_args = []
     for or_expr in and_expr.args:
-        assert isinstance(or_expr, Or)
-
         if lit not in or_expr.args:
             and_args.append(or_expr)
 

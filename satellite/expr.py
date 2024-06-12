@@ -1,6 +1,6 @@
 from __future__ import annotations
 import functools
-from typing import Any, Callable, Generic, Optional, Tuple, TypeVar, cast
+from typing import Any, Callable, Generic, Optional, Tuple, TypeVar, cast, Union
 
 from satellite.utils import SlotClass
 
@@ -105,24 +105,24 @@ class Var(Expr):
         return self
 
 
-class Connective(Expr):
+class Connective(Expr, Generic[T]):
     __slots__ = ("args",)
     __match_args__ = ("args",)
 
     precedence: int
 
-    args: Tuple[Expr, ...]
+    args: Tuple[T, ...]
 
     def __init__(self, *args: Expr):
         super().__init__(args)
 
 
-class And(Connective):
+class And(Connective[T]):
     __slots__ = ()
     precedence = 3
 
 
-class Or(Connective):
+class Or(Connective[T]):
     __slots__ = ()
     precedence = 2
 
@@ -151,6 +151,10 @@ class Implies(BinOp[T, U]):
 class Equivalent(BinOp[T, U]):
     __slots__ = ()
     precedence = 0
+
+
+Literal = Union[Var, Not[Var]]
+CNF = And[Or[Literal]]
 
 
 def var(*specs: str, sep: Optional[str] = None) -> Tuple[Var, ...]:
