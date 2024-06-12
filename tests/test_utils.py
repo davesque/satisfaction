@@ -37,6 +37,34 @@ class TestPlaces:
         assert places.incr() == [0, 0, 0]
 
 
+def test_letters() -> None:
+    gen = utils.letters()
+
+    assert next(gen) == "a"
+    for _ in range(24):
+        next(gen)
+    assert next(gen) == "z"
+    assert next(gen) == "aa"
+    assert next(gen) == "ab"
+    for _ in range(23):
+        next(gen)
+    assert next(gen) == "az"
+    assert next(gen) == "ba"
+    for _ in range(25 * 26):
+        next(gen)
+    assert next(gen) == "aab"
+
+
+def test_numbered_var() -> None:
+    gen = utils.numbered_var("x", 0)
+    assert next(gen) == "x0"
+    assert next(gen) == "x1"
+
+    gen = utils.numbered_var("x", 100)
+    assert next(gen) == "x100"
+    assert next(gen) == "x101"
+
+
 class OneSlot(utils.SlotClass):
     __slots__ = ("foo",)
 

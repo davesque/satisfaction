@@ -34,6 +34,23 @@ class Places(list):
             i += 1
 
 
+ORD_A = ord("a")
+
+
+def letters() -> Iterator[str]:
+    places = Places(26, skip_zero=False)
+    while True:
+        yield "".join(chr(ORD_A + p) for p in reversed(places))
+        places.incr()
+
+
+def numbered_var(name: str, n: int) -> Iterator[str]:
+    i = n
+    while True:
+        yield f"{name}{i}"
+        i += 1
+
+
 class SlotClass:
     __slots__ = ()
 
