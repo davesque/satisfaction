@@ -1,7 +1,10 @@
 from collections import defaultdict
+import logging
 from typing import Callable, Optional, Set, cast
 
 from satellite.expr import And, CNF, Expr, Literal, Or
+
+logger = logging.getLogger(__name__)
 
 
 def first_lit(expr: CNF) -> Literal:
@@ -41,8 +44,10 @@ def dpll(expr: CNF, choose_lit: Callable[[CNF], Literal] = first_lit) -> bool:
 
     lit = choose_lit(expr)
 
+    logger.debug("+++++++++++++ branching +++++++++++++")
     if dpll(unit_propagate(lit, expr), choose_lit):
         return True
+    logger.debug("------------ backtracking -----------")
     return dpll(unit_propagate(~lit, expr), choose_lit)
 
 
@@ -53,6 +58,8 @@ def find_unit(and_expr: CNF) -> Optional[Expr]:
 
 
 def unit_propagate(lit: Expr, and_expr: CNF) -> CNF:
+    logger.debug("eliminating unit: %s", lit)
+
     not_lit = ~lit
     and_args = []
     for or_expr in and_expr.args:
@@ -88,6 +95,8 @@ def find_pure(and_expr: CNF) -> Set[Expr]:
 
 
 def pure_literal_assign(lit: Expr, and_expr: CNF) -> CNF:
+    logger.debug("eliminating pure literal: %s", lit)
+
     and_args = []
     for or_expr in and_expr.args:
         if lit not in or_expr.args:
