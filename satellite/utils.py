@@ -1,5 +1,37 @@
 from textwrap import indent
-from typing import Any, Iterator
+from typing import Any, Iterator, List
+
+
+class Places(list):
+    __slots__ = ("base", "skip_zero")
+
+    base: int
+    skip_zero: bool
+
+    def __init__(self, base: int, skip_zero: bool = True):
+        super().__init__([0])
+
+        self.base = base
+        self.skip_zero = skip_zero
+
+    def incr(self) -> List[int]:
+        self[0] += 1
+        self.carry()
+        return self
+
+    def carry(self) -> None:
+        i = 0
+        while True:
+            if self[i] < self.base:
+                break
+
+            self[i] = 0
+            if len(self) == i + 1:
+                self.append(1 if self.skip_zero else 0)
+            else:
+                self[i + 1] += 1
+
+            i += 1
 
 
 class SlotClass:

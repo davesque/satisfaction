@@ -6,6 +6,37 @@ import pytest
 from satellite import utils
 
 
+class TestPlaces:
+    def test_slots(self) -> None:
+        places = utils.Places(2)
+        with pytest.raises(AttributeError):
+            places.__dict__
+
+    def test_init(self) -> None:
+        places = utils.Places(2, skip_zero=False)
+        assert places.base == 2
+        assert places.skip_zero is False
+        assert list(places) == [0]
+
+        places = utils.Places(2)
+        assert places.skip_zero is True
+
+    def test_incr_and_carry(self) -> None:
+        places = utils.Places(2, skip_zero=True)
+        assert places.incr() == [1]
+        assert places.incr() == [0, 1]
+        assert places.incr() == [1, 1]
+        assert places.incr() == [0, 0, 1]
+
+        places = utils.Places(2, skip_zero=False)
+        assert places.incr() == [1]
+        assert places.incr() == [0, 0]
+        assert places.incr() == [1, 0]
+        assert places.incr() == [0, 1]
+        assert places.incr() == [1, 1]
+        assert places.incr() == [0, 0, 0]
+
+
 class OneSlot(utils.SlotClass):
     __slots__ = ("foo",)
 
