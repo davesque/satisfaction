@@ -8,29 +8,6 @@ T = TypeVar("T", bound="Expr")
 U = TypeVar("U", bound="Expr")
 
 
-def format_expr(expr: Expr, parent: Optional[Expr] = None) -> str:
-    match expr:
-        case Var(name):  # type: ignore
-            return name
-
-        case Not(sub_expr):  # type: ignore
-            return f"~{format_expr(sub_expr, expr)}"
-
-        case Connective(args):  # type: ignore
-            try:
-                parent_precedence = parent.precedence  # type: ignore
-            except AttributeError:
-                parent_precedence = float("inf")
-
-            args_repr = expr.join_with.join(format_expr(a, expr) for a in args)
-            if parent is None or expr.precedence > parent_precedence:
-                return args_repr
-            else:
-                return f"({args_repr})"
-
-    raise ValueError(f"unsupported value: {expr}")
-
-
 def require_expr(old_fn: Callable[[T, Expr], U]) -> Callable[[T, Any], U]:
     @functools.wraps(old_fn)
     def new_fn(self: T, other: Any) -> U:
@@ -77,6 +54,7 @@ class Expr(SlotClass):
         return hash((type(self),) + tuple(self.__values__()))
 
     def __repr__(self) -> str:
+        from satellite.format import format_expr
         return format_expr(self)
 
     @property
