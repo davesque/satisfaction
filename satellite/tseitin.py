@@ -18,7 +18,7 @@ class Tseitin:
     rename_vars: bool
     name_gen: Iterator[str]
 
-    equivalences: Set[Equivalent]
+    equivalences: Set[Equivalent[Var, Expr]]
     renames: Dict[Var, Var]
     root: Expr
 

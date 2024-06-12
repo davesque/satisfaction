@@ -1,6 +1,6 @@
 from __future__ import annotations
 import functools
-from typing import Any, Callable, Optional, Tuple, TypeVar
+from typing import Any, Callable, Generic, Optional, Tuple, TypeVar, cast
 
 from satellite.utils import SlotClass
 
@@ -80,13 +80,13 @@ class Expr(SlotClass):
         return True
 
 
-class Not(Expr):
+class Not(Expr, Generic[T]):
     __slots__ = ("expr",)
     __match_args__ = ("expr",)
 
     precedence = 4
 
-    expr: Expr
+    expr: T
 
     @property
     def atom(self) -> Optional[Var]:
@@ -127,20 +127,28 @@ class Or(Connective):
     precedence = 2
 
 
-class BinOp(Connective):
+class BinOp(Connective, Generic[T, U]):
     __slots__ = ()
 
     # enforce two args
-    def __init__(self, lhs: Expr, rhs: Expr):
+    def __init__(self, lhs: T, rhs: U):
         super().__init__(lhs, rhs)
 
+    @property
+    def lhs(self) -> T:
+        return cast(T, self.args[0])
 
-class Implies(BinOp):
+    @property
+    def rhs(self) -> U:
+        return cast(U, self.args[1])
+
+
+class Implies(BinOp[T, U]):
     __slots__ = ()
     precedence = 1
 
 
-class Equivalent(BinOp):
+class Equivalent(BinOp[T, U]):
     __slots__ = ()
     precedence = 0
 
