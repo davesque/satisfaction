@@ -67,7 +67,6 @@ def test_dpll_unsat(and_expr: And) -> None:
 
 def test_queens() -> None:
     queens = Queens(2)
-
     queens_formula = queens.get_formula()
 
     tseitin = Tseitin(queens_formula, rename_vars=False, name_gen=numbered_var("x", 0))
