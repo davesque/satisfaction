@@ -59,24 +59,8 @@ class Expr(SlotClass):
 
         return format_expr(self)
 
-    @property
     def atom(self) -> Var | None:
         return None
-
-    @property
-    def is_cnf(self) -> bool:
-        if not isinstance(self, And):
-            return False
-
-        for and_arg in self.args:
-            if not isinstance(and_arg, Or):
-                return False
-
-            for or_arg in and_arg.args:
-                if or_arg.atom is None:
-                    return False
-
-        return True
 
 
 class Not[T: Expr](Expr):
@@ -87,10 +71,12 @@ class Not[T: Expr](Expr):
 
     expr: T
 
-    @property
+    def __init__(self, expr: T) -> None:
+        self.expr = expr
+
     def atom(self) -> Var | None:
         # not `None` if `self.expr` is a `Var`
-        return self.expr.atom
+        return self.expr.atom()
 
 
 class Var(Expr):
@@ -104,7 +90,6 @@ class Var(Expr):
         self.name = name
         self.generated = generated
 
-    @property
     def atom(self) -> Var:
         return self
 

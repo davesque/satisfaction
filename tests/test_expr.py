@@ -50,22 +50,11 @@ class TestExpr:
 
     def test_atom(self) -> None:
         not_x = ~x
-        or_x = x | x
-        and_x = x & x
+        not_and = ~(x & x)
 
-        assert x.atom == x
-        assert not_x.atom == x
-        assert or_x.atom is None
-        assert and_x.atom is None
-
-    def test_is_cnf(self) -> None:
-        assert not x.is_cnf
-        assert not (w & x).is_cnf
-        assert not (((w & x) | y) & z).is_cnf
-        assert not ((~(w & x) | y) & z).is_cnf
-        assert ((w | x) & (y | z)).is_cnf
-        assert ((w | ~x) & (y | z)).is_cnf
-        assert ((w | ~x) & (y | ~z)).is_cnf
+        assert x.atom() == x
+        assert not_x.atom() == x
+        assert not_and.atom() is None
 
 
 def test_var() -> None:

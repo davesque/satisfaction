@@ -119,7 +119,7 @@ def find_pure(and_expr: CNF) -> set[Expr]:
     lit_variants = defaultdict(set)
     for or_expr in and_expr.args:
         for or_lit in or_expr.args:
-            atom = or_lit.atom
+            atom = or_lit.atom()
             lit_variants[atom].add(or_lit)
 
     pure_lits = {tuple(v)[0] for v in lit_variants.values() if len(v) == 1}
