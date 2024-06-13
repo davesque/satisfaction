@@ -5,9 +5,12 @@ from satellite.utils import letters
 
 
 def partitions(vars: tuple[Var, ...]) -> Iterator[tuple[Var, tuple[Var, ...]]]:
+    if len(vars) < 1:
+        raise ValueError("cannot partition zero-length sequence")
+
     for i in range(len(vars)):
         var = vars[i]
-        others = tuple(vars[:i]) + tuple(vars[i + 1 :])
+        others = tuple(vars[:i] + vars[i + 1 :])
 
         yield var, others
 
@@ -15,8 +18,11 @@ def partitions(vars: tuple[Var, ...]) -> Iterator[tuple[Var, tuple[Var, ...]]]:
 def exactly_one(vars: tuple[Var, ...]) -> Or:
     clauses = []
     for var, others in partitions(vars):
-        no_others = ~Or(*others) if len(others) > 1 else ~others[0]
-        clauses.append(var & no_others)
+        if len(others) == 0:
+            clauses.append(var)
+        else:
+            no_others = ~others[0] if len(others) == 1 else ~Or(*others)
+            clauses.append(var & no_others)
 
     return Or(*clauses)
 
