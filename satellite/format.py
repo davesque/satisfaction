@@ -30,21 +30,25 @@ class Formatter:
         raise ValueError(f"unsupported value: {expr}")
 
 
-pythonic = Formatter({
-    Not: "~",
-    And: " & ",
-    Or: " | ",
-    Implies: " -> ",
-    Equivalent: " <-> ",
-})
+pythonic = Formatter(
+    {
+        Not: "~",
+        And: " & ",
+        Or: " | ",
+        Implies: " -> ",
+        Equivalent: " <-> ",
+    }
+)
 
-standard = Formatter({
-    Not: "¬",
-    And: " ∧ ",
-    Or: " ∨ ",
-    Implies: " ⇒ ",
-    Equivalent: " ⇔ ",
-})
+standard = Formatter(
+    {
+        Not: "¬",
+        And: " ∧ ",
+        Or: " ∨ ",
+        Implies: " ⇒ ",
+        Equivalent: " ⇔ ",
+    }
+)
 
 default = pythonic
 
