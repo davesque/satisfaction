@@ -23,11 +23,8 @@ class Expr(SlotClass):
 
     precedence = float("inf")
 
-    def __invert__(self) -> Expr:
-        if isinstance(self, Not):
-            return self.expr
-        else:
-            return Not(self)
+    def __invert__[T: "Expr"](self: T) -> Not[T]:
+        return Not(self)
 
     @require_expr
     def __or__(self, other: Expr) -> Or:
@@ -70,6 +67,9 @@ class Not[T: Expr](Expr):
 
     def __init__(self, expr: T) -> None:
         self.expr = expr
+
+    def __invert__(self) -> T:  # type: ignore
+        return self.expr
 
     def atom(self) -> Var:
         if isinstance(self.expr, Var):
