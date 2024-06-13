@@ -95,10 +95,15 @@ class Not(Expr, Generic[T]):
 
 
 class Var(Expr):
-    __slots__ = ("name",)
+    __slots__ = ("name", "generated")
     __match_args__ = ("name",)
 
     name: str
+    generated: bool
+
+    def __init__(self, name: str, generated: bool = False) -> None:
+        self.name = name
+        self.generated = generated
 
     @property
     def atom(self) -> Var:
@@ -159,10 +164,12 @@ Lit = Var | Not[Var]
 CNF = And[Or[Lit]]
 
 
-def var(*specs: str, sep: str | None = None) -> tuple[Var, ...]:
+def var(
+    *specs: str, sep: str | None = None, generated: bool = False
+) -> tuple[Var, ...]:
     res = []
     for spec in specs:
         for v in spec.split(sep=sep):
-            res.append(Var(v.strip()))
+            res.append(Var(v.strip(), generated=generated))
 
     return tuple(res)

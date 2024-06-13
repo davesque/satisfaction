@@ -51,7 +51,7 @@ class Tseitin:
         self.root = self.rewrite(expr)
 
     def new_var(self) -> Var:
-        return Var(next(self.name_gen))
+        return Var(next(self.name_gen), generated=True)
 
     def lookup(self, orig_var: Var) -> Var:
         try:

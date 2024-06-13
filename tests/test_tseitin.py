@@ -11,7 +11,7 @@ def test_tseitin_transform() -> None:
 
     tseitin = Tseitin(expr, rename_vars=False, name_gen=numbered_var("x", 1))
 
-    x1, x2, x3, x4, x5 = var("x1 x2 x3 x4 x5")
+    x1, x2, x3, x4, x5 = var("x1 x2 x3 x4 x5", generated=True)
 
     assert tseitin.root == x1
     assert tseitin.renames == {}
