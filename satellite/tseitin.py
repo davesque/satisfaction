@@ -1,6 +1,17 @@
 from typing import Dict, Iterator, List, Optional, Set
 
-from satellite.expr import And, Connective, Equivalent, Expr, Implies, Not, Or, Var, CNF, Literal
+from satellite.expr import (
+    And,
+    CNF,
+    Connective,
+    Equivalent,
+    Expr,
+    Implies,
+    Lit,
+    Not,
+    Or,
+    Var,
+)
 from satellite.utils import letters
 
 
@@ -20,7 +31,7 @@ class Tseitin:
 
     equivalences: Set[Equivalent[Var, Expr]]
     renames: Dict[Var, Var]
-    root: Expr
+    root: Lit
 
     def __init__(
         self,
@@ -50,7 +61,7 @@ class Tseitin:
             self.renames[orig_var] = new_var
             return new_var
 
-    def rewrite(self, expr: Expr) -> Literal:
+    def rewrite(self, expr: Expr) -> Lit:
         match expr:
             case Var(_):
                 return self.lookup(expr) if self.rename_vars else expr
@@ -125,7 +136,7 @@ class Tseitin:
         else:
             equivalences = self.equivalences
 
-        parts: List[Expr] = [Or(self.root)]
+        parts: List[Or[Lit]] = [Or(self.root)]
         for equiv in equivalences:
             and_expr = self.equiv_to_cnf(equiv)
             parts.extend(and_expr.args)

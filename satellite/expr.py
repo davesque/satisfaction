@@ -155,8 +155,8 @@ class Equivalent(BinOp[T, U]):
     precedence = 0
 
 
-Literal = Union[Var, Not[Var]]
-CNF = And[Or[Literal]]
+Lit = Union[Var, Not[Var]]
+CNF = And[Or[Lit]]
 
 
 def var(*specs: str, sep: Optional[str] = None) -> Tuple[Var, ...]:

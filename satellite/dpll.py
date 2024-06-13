@@ -3,7 +3,7 @@ import logging
 import random
 from typing import Callable, Dict, Optional, Set, cast
 
-from satellite.expr import And, CNF, Connective, Expr, Literal, Not, Or, Var
+from satellite.expr import And, CNF, Connective, Expr, Lit, Not, Or, Var
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def count_lits(expr: Expr, counter: Dict[Var, int]) -> None:
                 count_lits(arg, counter)
 
 
-def common_lit(expr: CNF) -> Literal:
+def common_lit(expr: CNF) -> Lit:
     counter = defaultdict(lambda: 0)
     count_lits(expr, counter)
 
@@ -28,23 +28,23 @@ def common_lit(expr: CNF) -> Literal:
     return counts[0][0]
 
 
-def first_lit(expr: CNF) -> Literal:
+def first_lit(expr: CNF) -> Lit:
     or_expr = cast(Or, expr.args[0])
     return or_expr.args[0]
 
 
-def last_lit(expr: CNF) -> Literal:
+def last_lit(expr: CNF) -> Lit:
     or_expr = cast(Or, expr.args[-1])
     return or_expr.args[-1]
 
 
-def random_lit(expr: CNF) -> Literal:
+def random_lit(expr: CNF) -> Lit:
     or_expr = cast(Or, random.choice(expr.args))
     lit = random.choice(or_expr.args)
     return lit
 
 
-def dpll(expr: CNF, choose_lit: Callable[[CNF], Literal] = common_lit) -> bool:
+def dpll(expr: CNF, choose_lit: Callable[[CNF], Lit] = common_lit) -> bool:
     """
     The Davis-Putnam-Logemann-Loveland (DPLL) SAT algorithm.
 
