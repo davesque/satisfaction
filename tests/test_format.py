@@ -1,5 +1,3 @@
-from typing import Dict, Type
-
 import pytest
 
 from satellite.expr import Equivalent, Expr, Implies, Var
@@ -13,7 +11,7 @@ z = Var("z")
 
 class TestFormatter:
     def test_init(self) -> None:
-        symbols: Dict[Type[Expr], str] = {Implies: "foo"}
+        symbols: dict[type[Expr], str] = {Implies: "foo"}
         formatter = Formatter(symbols)
         assert formatter.symbols == symbols
 

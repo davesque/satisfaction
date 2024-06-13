@@ -1,6 +1,6 @@
 from __future__ import annotations
 import functools
-from typing import Any, Callable, Generic, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Generic, TypeVar, Union
 
 from satellite.utils import SlotClass
 
@@ -61,7 +61,7 @@ class Expr(SlotClass):
         return format_expr(self)
 
     @property
-    def atom(self) -> Optional[Var]:
+    def atom(self) -> Var | None:
         return None
 
     @property
@@ -89,7 +89,7 @@ class Not(Expr, Generic[T]):
     expr: T
 
     @property
-    def atom(self) -> Optional[Var]:
+    def atom(self) -> Var | None:
         # not `None` if `self.expr` is a `Var`
         return self.expr.atom
 
@@ -101,7 +101,7 @@ class Var(Expr):
     name: str
 
     @property
-    def atom(self) -> Optional[Var]:
+    def atom(self) -> Var:
         return self
 
 
@@ -111,7 +111,7 @@ class Connective(Expr, Generic[T]):
 
     precedence: int
 
-    args: Tuple[T, ...]
+    args: tuple[T, ...]
 
     def __init__(self, *args: T):
         super().__init__(args)
@@ -130,7 +130,7 @@ class Or(Connective[T]):
 class BinOp(Connective, Generic[T, U]):
     __slots__ = ()
 
-    args: Tuple[T, U]
+    args: tuple[T, U]
 
     # enforce two args
     def __init__(self, lhs: T, rhs: U):
@@ -155,11 +155,11 @@ class Equivalent(BinOp[T, U]):
     precedence = 0
 
 
-Lit = Union[Var, Not[Var]]
+Lit = Var | Not[Var]
 CNF = And[Or[Lit]]
 
 
-def var(*specs: str, sep: Optional[str] = None) -> Tuple[Var, ...]:
+def var(*specs: str, sep: str | None = None) -> tuple[Var, ...]:
     res = []
     for spec in specs:
         for v in spec.split(sep=sep):

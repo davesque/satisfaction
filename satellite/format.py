@@ -1,16 +1,15 @@
 from __future__ import annotations
-from typing import Optional, Dict, Type
 
 from satellite.expr import Expr, Var, Not, Connective, And, Or, Implies, Equivalent
 
 
 class Formatter:
-    symbols: Dict[Type[Expr], str]
+    symbols: dict[type[Expr], str]
 
-    def __init__(self, symbols: Dict[Type[Expr], str]) -> None:
+    def __init__(self, symbols: dict[type[Expr], str]) -> None:
         self.symbols = symbols
 
-    def format(self, expr: Expr, parent: Optional[Expr] = None) -> str:
+    def format(self, expr: Expr, parent: Expr | None = None) -> str:
         match expr:
             case Var(name):
                 return name

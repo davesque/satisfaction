@@ -25,7 +25,7 @@ extras_require["dev"] += extras_require["test"] + extras_require["lint"]
 setup(
     name="satellite",
     version="0.1.0",
-    python_requires=">=3.10",
+    python_requires=">=3.12",
     extras_require=extras_require,
     packages=["satellite"],
 )

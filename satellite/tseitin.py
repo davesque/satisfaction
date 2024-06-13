@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Optional, Set
+from typing import Iterator
 
 from satellite.expr import (
     And,
@@ -29,15 +29,15 @@ class Tseitin:
     rename_vars: bool
     name_gen: Iterator[str]
 
-    equivalences: Set[Equivalent[Var, Expr]]
-    renames: Dict[Var, Var]
+    equivalences: set[Equivalent[Var, Expr]]
+    renames: dict[Var, Var]
     root: Lit
 
     def __init__(
         self,
         expr: Expr,
         rename_vars: bool = True,
-        name_gen: Optional[Iterator[str]] = None,
+        name_gen: Iterator[str] | None = None,
     ) -> None:
         if name_gen is None:
             name_gen = letters()
@@ -136,7 +136,7 @@ class Tseitin:
         else:
             equivalences = self.equivalences
 
-        parts: List[Or[Lit]] = [Or(self.root)]
+        parts: list[Or[Lit]] = [Or(self.root)]
         for equiv in equivalences:
             and_expr = self.equiv_to_cnf(equiv)
             parts.extend(and_expr.args)

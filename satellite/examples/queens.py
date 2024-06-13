@@ -1,10 +1,10 @@
-from typing import Iterator, Tuple
+from typing import Iterator
 
 from satellite.expr import And, Or, Var
 from satellite.utils import letters
 
 
-def partitions(vars: Tuple[Var, ...]) -> Iterator[Tuple[Var, Tuple[Var, ...]]]:
+def partitions(vars: tuple[Var, ...]) -> Iterator[tuple[Var, tuple[Var, ...]]]:
     for i in range(len(vars)):
         var = vars[i]
         others = tuple(vars[:i]) + tuple(vars[i + 1 :])
@@ -12,7 +12,7 @@ def partitions(vars: Tuple[Var, ...]) -> Iterator[Tuple[Var, Tuple[Var, ...]]]:
         yield var, others
 
 
-def exactly_one(vars: Tuple[Var, ...]) -> Or:
+def exactly_one(vars: tuple[Var, ...]) -> Or:
     clauses = []
     for var, others in partitions(vars):
         no_others = ~Or(*others) if len(others) > 1 else ~others[0]
@@ -32,20 +32,20 @@ class Queens:
                 vars.append(Var(f"{c}{r}"))
         self.vars = vars
 
-    def __getitem__(self, coords: Tuple[int, int]) -> Var:
+    def __getitem__(self, coords: tuple[int, int]) -> Var:
         c, r = coords
         if not (0 <= c < self.n) or not (0 <= r < self.n):
             raise IndexError(f"index is not on board: {c}, {r}")
 
         return self.vars[r * self.n + c]
 
-    def row(self, i: int) -> Tuple[Var, ...]:
+    def row(self, i: int) -> tuple[Var, ...]:
         return tuple(self[j, i] for j in range(self.n))
 
-    def col(self, i: int) -> Tuple[Var, ...]:
+    def col(self, i: int) -> tuple[Var, ...]:
         return tuple(self[i, j] for j in range(self.n))
 
-    def ldiag(self, i: int) -> Tuple[Var, ...]:
+    def ldiag(self, i: int) -> tuple[Var, ...]:
         diag = []
         for j in range(self.d):
             try:
@@ -54,7 +54,7 @@ class Queens:
                 pass
         return tuple(diag)
 
-    def rdiag(self, i: int) -> Tuple[Var, ...]:
+    def rdiag(self, i: int) -> tuple[Var, ...]:
         diag = []
         for j in range(self.d):
             try:

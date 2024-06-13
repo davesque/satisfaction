@@ -1,10 +1,10 @@
 from textwrap import indent
-from typing import Any, Iterable, Iterator, List, Tuple, TypeVar
+from typing import Any, Iterable, Iterator, TypeVar
 
 T = TypeVar("T")
 
 
-def chunks(iter: Iterable[T], n: int) -> Iterator[Tuple[T, ...]]:
+def chunks(iter: Iterable[T], n: int) -> Iterator[tuple[T, ...]]:
     chunk = []
     for el in iter:
         chunk.append(el)
@@ -28,7 +28,7 @@ class Places(list):
         self.base = base
         self.skip_zero = skip_zero
 
-    def incr(self) -> List[int]:
+    def incr(self) -> list[int]:
         self[0] += 1
         self.carry()
         return self

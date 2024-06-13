@@ -1,14 +1,14 @@
 from collections import defaultdict
 import logging
 import random
-from typing import Callable, Dict, Optional, Set, cast
+from typing import Callable
 
 from satellite.expr import And, CNF, Connective, Expr, Lit, Not, Or, Var
 
 logger = logging.getLogger(__name__)
 
 
-def count_lits(expr: Expr, counter: Dict[Var, int]) -> None:
+def count_lits(expr: Expr, counter: dict[Var, int]) -> None:
     match expr:
         case Var(_):
             # if name.startswith("x"):
@@ -29,17 +29,17 @@ def common_lit(expr: CNF) -> Lit:
 
 
 def first_lit(expr: CNF) -> Lit:
-    or_expr = cast(Or, expr.args[0])
+    or_expr = expr.args[0]
     return or_expr.args[0]
 
 
 def last_lit(expr: CNF) -> Lit:
-    or_expr = cast(Or, expr.args[-1])
+    or_expr = expr.args[-1]
     return or_expr.args[-1]
 
 
 def random_lit(expr: CNF) -> Lit:
-    or_expr = cast(Or, random.choice(expr.args))
+    or_expr = random.choice(expr.args)
     lit = random.choice(or_expr.args)
     return lit
 
@@ -83,7 +83,7 @@ def dpll(expr: CNF, choose_lit: Callable[[CNF], Lit] = common_lit) -> bool:
     return dpll(unit_propagate(~lit, expr), choose_lit)
 
 
-def find_unit(and_expr: CNF) -> Optional[Expr]:
+def find_unit(and_expr: CNF) -> Expr | None:
     for or_expr in and_expr.args:
         if len(or_expr.args) == 1:
             return or_expr.args[0]
@@ -115,7 +115,7 @@ def unit_propagate(lit: Expr, and_expr: CNF) -> CNF:
     return And(*and_args)
 
 
-def find_pure(and_expr: CNF) -> Set[Expr]:
+def find_pure(and_expr: CNF) -> set[Expr]:
     lit_variants = defaultdict(set)
     for or_expr in and_expr.args:
         for or_lit in or_expr.args:
