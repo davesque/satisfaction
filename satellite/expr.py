@@ -160,8 +160,8 @@ class Equivalent(BinOp[T, U]):
     precedence = 0
 
 
-Lit = Var | Not[Var]
-CNF = And[Or[Lit]]
+type Lit = Var | Not[Var]
+type CNF = And[Or[Lit]]
 
 
 def var(
