@@ -59,9 +59,6 @@ class Expr(SlotClass):
 
         return format_expr(self)
 
-    def atom(self) -> Var | None:
-        return None
-
 
 class Not[T: Expr](Expr):
     __slots__ = ("expr",)
@@ -74,9 +71,11 @@ class Not[T: Expr](Expr):
     def __init__(self, expr: T) -> None:
         self.expr = expr
 
-    def atom(self) -> Var | None:
-        # not `None` if `self.expr` is a `Var`
-        return self.expr.atom()
+    def atom(self) -> Var:
+        if isinstance(self.expr, Var):
+            return self.expr
+        else:
+            raise ValueError("cannot get atom for non-literal")
 
 
 class Var(Expr):

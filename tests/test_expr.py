@@ -54,7 +54,8 @@ class TestExpr:
 
         assert x.atom() == x
         assert not_x.atom() == x
-        assert not_and.atom() is None
+        with pytest.raises(ValueError):
+            not_and.atom()
 
 
 def test_var() -> None:
