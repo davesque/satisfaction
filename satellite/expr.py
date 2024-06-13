@@ -1,6 +1,6 @@
 from __future__ import annotations
 import functools
-from typing import Any, Callable, Generic, Optional, Tuple, TypeVar, cast, Union
+from typing import Any, Callable, Generic, Optional, Tuple, TypeVar, Union
 
 from satellite.utils import SlotClass
 
@@ -113,7 +113,7 @@ class Connective(Expr, Generic[T]):
 
     args: Tuple[T, ...]
 
-    def __init__(self, *args: Expr):
+    def __init__(self, *args: T):
         super().__init__(args)
 
 
@@ -130,17 +130,19 @@ class Or(Connective[T]):
 class BinOp(Connective, Generic[T, U]):
     __slots__ = ()
 
+    args: Tuple[T, U]
+
     # enforce two args
     def __init__(self, lhs: T, rhs: U):
         super().__init__(lhs, rhs)
 
     @property
     def lhs(self) -> T:
-        return cast(T, self.args[0])
+        return self.args[0]
 
     @property
     def rhs(self) -> U:
-        return cast(U, self.args[1])
+        return self.args[1]
 
 
 class Implies(BinOp[T, U]):
