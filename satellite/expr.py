@@ -1,14 +1,13 @@
 from __future__ import annotations
 import functools
-from typing import Any, Callable, Generic, TypeVar
+from typing import Any, Callable
 
 from satellite.utils import SlotClass
 
-T = TypeVar("T", bound="Expr")
-U = TypeVar("U", bound="Expr")
 
-
-def require_expr(old_fn: Callable[[T, Expr], U]) -> Callable[[T, Any], U]:
+def require_expr[
+    T: "Expr", U: "Expr"
+](old_fn: Callable[[T, Expr], U]) -> Callable[[T, Any], U]:
     @functools.wraps(old_fn)
     def new_fn(self: T, other: Any) -> U:
         if not isinstance(other, Expr):
@@ -80,7 +79,7 @@ class Expr(SlotClass):
         return True
 
 
-class Not(Expr, Generic[T]):
+class Not[T: Expr](Expr):
     __slots__ = ("expr",)
     __match_args__ = ("expr",)
 
@@ -110,7 +109,7 @@ class Var(Expr):
         return self
 
 
-class Connective(Expr, Generic[T]):
+class Connective[T: Expr](Expr):
     __slots__ = ("args",)
     __match_args__ = ("args",)
 
@@ -122,17 +121,17 @@ class Connective(Expr, Generic[T]):
         super().__init__(args)
 
 
-class And(Connective[T]):
+class And[T: Expr](Connective[T]):
     __slots__ = ()
     precedence = 3
 
 
-class Or(Connective[T]):
+class Or[T: Expr](Connective[T]):
     __slots__ = ()
     precedence = 2
 
 
-class BinOp(Connective, Generic[T, U]):
+class BinOp[T: Expr, U: Expr](Connective):
     __slots__ = ()
 
     args: tuple[T, U]
@@ -150,12 +149,12 @@ class BinOp(Connective, Generic[T, U]):
         return self.args[1]
 
 
-class Implies(BinOp[T, U]):
+class Implies[T: Expr, U: Expr](BinOp[T, U]):
     __slots__ = ()
     precedence = 1
 
 
-class Equivalent(BinOp[T, U]):
+class Equivalent[T: Expr, U: Expr](BinOp[T, U]):
     __slots__ = ()
     precedence = 0
 
