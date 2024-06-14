@@ -1,45 +1,46 @@
 from .exceptions import ConflictError
-from .expr import Lit, Not, Var
+from .expr import Clause, Lit, Not, Var, Var
+
+type Subject = Clause | Var
+type Facts = dict[Clause | Var, bool]
 
 
 class Assignments:
     __slots__ = ("branches", "cache")
 
-    branches: list[dict[Var, bool]]
-    cache: dict[Var, bool]
+    branches: list[Facts]
+    cache: Facts
 
     def __init__(self) -> None:
         self.branches = [{}]
         self.cache = {}
 
-    def set(self, var: Var, x: bool) -> None:
-        if var in self.cache:
-            if self.cache[var] is x:
+    def set(self, expr: Subject, x: bool) -> None:
+        if expr in self.cache:
+            if self.cache[expr] is x:
                 return
             else:
                 raise ConflictError(
-                    f"'{x}' conflicts with existing assignment for '{var}'"
+                    f"'{x}' conflicts with existing assignment for '{expr}'"
                 )
 
-        self.branches[-1][var] = x
-        self.cache[var] = x
+        self.branches[-1][expr] = x
+        self.cache[expr] = x
 
-    def get(self, var: Var) -> bool:
-        return self.cache[var]
+    def get(self, expr: Subject) -> bool:
+        return self.cache[expr]
 
-    def assign(self, lit: Lit, x: bool) -> None:
-        match lit:
-            case Var(_):
-                self.set(lit, x)
+    def assign(self, expr: Clause | Lit, x: bool) -> None:
+        match expr:
             case Not(Var(_) as var):
                 self.set(var, not x)
             case _:
-                raise ValueError(f"cannot assign to non-literal: {type(lit)}")
+                self.set(expr, x)
 
     def push(self) -> None:
         self.branches.append({})
 
-    def pop(self) -> dict[Var, bool]:
+    def pop(self) -> Facts:
         if len(self.branches) == 1:
             raise IndexError("cannot pop base branch")
 

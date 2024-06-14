@@ -144,7 +144,8 @@ class Equivalent[T: Expr, U: Expr](BinOp[T, U]):
 
 
 type Lit = Var | Not[Var]
-type CNF = And[Or[Lit]]
+type Clause = Or[Lit]
+type CNF = And[Clause]
 
 
 def var(

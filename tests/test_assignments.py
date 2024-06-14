@@ -44,18 +44,15 @@ class TestAssignments:
             (x, False),
             (~x, True),
             (~x, False),
+            (x | y, True),
         ),
     )
     def test_assign(self, assignments: Assignments, lit: Lit, val: bool) -> None:
         assignments.assign(lit, val)
-        if isinstance(lit, Var):
-            assert assignments.get(x) is val
-        elif isinstance(lit, Not):
-            assert assignments.get(x) is not val
-
-    def test_assign_raises(self, assignments: Assignments) -> None:
-        with pytest.raises(ValueError):
-            assignments.assign(1, True)  # type: ignore
+        if isinstance(lit, Not):
+            assert assignments.get(~lit) is not val
+        else:
+            assert assignments.get(lit) is val
 
     def test_push(self, assignments: Assignments) -> None:
         assert len(assignments.branches) == 1
