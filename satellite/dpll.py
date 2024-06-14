@@ -3,6 +3,7 @@ import logging
 import random
 from typing import Callable
 
+from satellite.assignments import Assignments
 from satellite.expr import And, CNF, Connective, Expr, Lit, Not, Or, Var
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ def random_lit(expr: CNF) -> Lit:
 
 
 class DPLL:
-    __slots__ = ("expr", "choose_lit")
+    __slots__ = ("expr", "choose_lit", "assignments")
 
     expr: CNF
     choose_lit: ChooseLit
@@ -56,6 +57,7 @@ class DPLL:
     def __init__(self, expr: CNF, choose_lit: ChooseLit = common_lit) -> None:
         self.expr = expr
         self.choose_lit = choose_lit
+        self.assignments = Assignments()
 
     def check(self, expr: CNF | None = None) -> bool:
         """
@@ -93,20 +95,28 @@ class DPLL:
         lit = self.choose_lit(expr)
 
         logger.debug("+++++++++++++ branching +++++++++++++")
+        self.assignments.push()
         if self.check(self.unit_propagate(lit, expr)):
             return True
+        self.assignments.pop()
+
         logger.debug("------------ backtracking -----------")
-        return self.check(self.unit_propagate(~lit, expr))
+        self.assignments.push()
+        if self.check(self.unit_propagate(~lit, expr)):
+            return True
+        self.assignments.pop()
+
+        return False
 
     @staticmethod
-    def find_unit(and_expr: CNF) -> Expr | None:
+    def find_unit(and_expr: CNF) -> Lit | None:
         for or_expr in and_expr.args:
             if len(or_expr.args) == 1:
                 return or_expr.args[0]
 
-    @staticmethod
-    def unit_propagate(lit: Expr, and_expr: CNF) -> CNF:
-        logger.debug("eliminating unit: %s", lit)
+    def unit_propagate(self, lit: Lit, and_expr: CNF) -> CNF:
+        logger.debug("assigning unit literal: %s", lit)
+        self.assignments.assign(lit, True)
 
         not_lit = ~lit
         and_args = []
@@ -131,7 +141,7 @@ class DPLL:
         return And(*and_args)
 
     @staticmethod
-    def find_pure(and_expr: CNF) -> set[Expr]:
+    def find_pure(and_expr: CNF) -> set[Lit]:
         lit_variants = defaultdict(set)
         for or_expr in and_expr.args:
             for or_lit in or_expr.args:
@@ -141,9 +151,9 @@ class DPLL:
         pure_lits = {tuple(v)[0] for v in lit_variants.values() if len(v) == 1}
         return pure_lits
 
-    @staticmethod
-    def pure_literal_assign(lit: Expr, and_expr: CNF) -> CNF:
-        logger.debug("eliminating pure literal: %s", lit)
+    def pure_literal_assign(self, lit: Lit, and_expr: CNF) -> CNF:
+        logger.debug("assigning pure literal: %s", lit)
+        self.assignments.assign(lit, True)
 
         and_args = []
         for or_expr in and_expr.args:
