@@ -4,6 +4,11 @@ from collections import defaultdict
 from .expr import CNF, Clause, Lit
 
 
+def set_repr(s: set) -> str:
+    els_repr = ", ".join(sorted(map(repr, s)))
+    return f"{{{els_repr}}}"
+
+
 class Index:
     __slots__ = ("clauses", "by_lit", "by_count")
 
@@ -33,8 +38,9 @@ class Index:
         return self.by_count[count]
 
     def move(self, clause: IndexClause, prev_count: int, curr_count: int) -> None:
-        self.by_count[prev_count].remove(clause)
-        self.by_count[curr_count].add(clause)
+        if prev_count != curr_count:
+            self.by_count[prev_count].remove(clause)
+            self.by_count[curr_count].add(clause)
 
     def push(self) -> None:
         for clause in self.clauses:
@@ -59,20 +65,22 @@ class IndexClause:
         assigned = self.assigned.pop()
 
         prev_len = len(self.unassigned)
-        self.unassigned.add(*assigned)
+        self.unassigned.update(assigned)
         curr_len = len(self.unassigned)
 
         self.index.move(self, prev_len, curr_len)
 
-    def assign(self, *lit: Lit) -> None:
-        self.assigned[-1].add(set(*lit) & self.unassigned)
+    def assign(self, *lits: Lit) -> None:
+        to_assign = set(lits)
+
+        self.assigned[-1].update(to_assign & self.unassigned)
 
         prev_len = len(self.unassigned)
-        self.unassigned.remove(*lit)
+        self.unassigned.difference_update(to_assign)
         curr_len = len(self.unassigned)
 
         self.index.move(self, prev_len, curr_len)
 
     def __repr__(self) -> str:
-        assigned_repr = ", ".join(map(repr, self.assigned))
-        return f"{repr(self.unassigned)} ({assigned_repr})"
+        assigned_repr = ", ".join(map(set_repr, self.assigned))
+        return f"{set_repr(self.unassigned)} ({assigned_repr})"
