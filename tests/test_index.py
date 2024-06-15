@@ -72,7 +72,17 @@ class TestIndex:
     def test_clauses_for_lit(
         self, index: Index, lit: Lit, clauses: tuple[int, ...]
     ) -> None:
-        for i, clause in enumerate(index.clauses):
-            logger.info(f"{i}: {clause}")
-
         assert index.clauses_for_lit(lit) == {index.clauses[i] for i in clauses}
+
+    @pytest.mark.parametrize(
+        "count,clauses",
+        (
+            (1, (0,)),
+            (2, (2, 3, 5, 6, 8, 9, 10, 11, 12, 13)),
+            (3, (1, 4, 7, 14)),
+        ),
+    )
+    def test_clauses_for_count(
+        self, index: Index, count: int, clauses: tuple[int, ...]
+    ) -> None:
+        assert index.clauses_for_count(count) == {index.clauses[i] for i in clauses}
