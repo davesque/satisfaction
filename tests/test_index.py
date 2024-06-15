@@ -28,7 +28,7 @@ def index() -> Index:
 class TestIndex:
     def test_init(self, index: Index) -> None:
         assert len(index.clauses) == len(cnf.args)
-        assert sorted(index.by_lit.keys(), key=repr) == [
+        assert sorted(index.clauses_by_lit.keys(), key=repr) == [
             p,
             q,
             r,
@@ -46,7 +46,7 @@ class TestIndex:
             ~x4,
             ~x5,
         ]
-        assert sorted(index.by_count.keys()) == [1, 2, 3]
+        assert sorted(index.clauses_by_count.keys()) == [1, 2, 3]
 
     @pytest.mark.parametrize(
         "lit,clauses",
