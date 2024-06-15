@@ -69,10 +69,13 @@ class Index:
         assigned = self.assigned_clauses.pop()
         self.unassigned_clauses.update(assigned)
 
-    def assign_clause(self, *clauses: IndexClause) -> None:
+    def assign_clause(self, *clauses: IndexClause, check_unassigned: bool = True) -> None:
         to_assign = set(clauses)
 
-        self.assigned_clauses[-1].update(to_assign & self.unassigned_clauses)
+        if check_unassigned:
+            self.assigned_clauses[-1].update(to_assign & self.unassigned_clauses)
+        else:
+            self.assigned_clauses[-1].update(to_assign)
         self.unassigned_clauses.difference_update(to_assign)
 
 
