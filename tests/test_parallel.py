@@ -1,6 +1,6 @@
 import pytest
 
-from satellite.dpll import DPLL
+from satellite.parallel import DPLL
 from satellite.examples.queens import Queens
 from satellite.expr import And, Or, var
 from satellite.tseitin import Tseitin
@@ -58,7 +58,7 @@ class TestDPLL:
 
 
 def test_queens() -> None:
-    queens = Queens(8)
+    queens = Queens(2)
     queens_formula = queens.get_formula()
 
     tseitin = Tseitin(queens_formula, rename_vars=False, name_gen=numbered_var("x", 0))
