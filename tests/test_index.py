@@ -46,7 +46,7 @@ class TestIndex:
             ~x4,
             ~x5,
         ]
-        assert sorted(index.clauses_by_count.keys()) == [1, 2, 3]
+        assert sorted(index.clauses_by_count.keys()) == [0, 1, 2, 3]
 
     @pytest.mark.parametrize(
         "lit,clauses",
