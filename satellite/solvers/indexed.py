@@ -38,7 +38,7 @@ class DPLL:
         # eliminated from a disjunction was determined to have a truth value of
         # `false`.  Therefore, the parent disjunction evaluates to `false` and the
         # root conjunction also evaluate to `false`.
-        if len(self.index.clauses_for_count(0)) > 0:
+        if len(self.index.clauses_with_count(0)) > 0:
             return False
 
         first_clause = next(iter(self.index.unassigned_clauses))
@@ -62,7 +62,7 @@ class DPLL:
 
     def find_units(self) -> set[Lit]:
         units = {}
-        for clause in self.index.clauses_for_count(1):
+        for clause in self.index.clauses_with_count(1):
             lit = next(iter(clause.unassigned))
             # We only want to propagate one polarity of a literal at a time.
             # This avoids accidentally claiming things like (P & ~P) are
@@ -75,9 +75,9 @@ class DPLL:
         logger.debug("assigning unit literals: %s", units)
 
         for unit in units:
-            clauses = self.index.clauses_for_lit(unit)
+            clauses = self.index.clauses_with_lit(unit)
             self.index.assign_clause(*clauses, check_unassigned=False)
 
             not_unit = ~unit
-            for clause in self.index.clauses_for_lit(not_unit):
+            for clause in self.index.clauses_with_lit(not_unit):
                 clause.assign(not_unit)

@@ -69,10 +69,10 @@ class TestIndex:
             (~x5, (10, 12, 13)),
         ),
     )
-    def test_clauses_for_lit(
+    def test_clauses_with_lit(
         self, index: Index, lit: Lit, clauses: tuple[int, ...]
     ) -> None:
-        assert index.clauses_for_lit(lit) == {index.clauses[i] for i in clauses}
+        assert index.clauses_with_lit(lit) == {index.clauses[i] for i in clauses}
 
     @pytest.mark.parametrize(
         "count,clauses",
@@ -82,10 +82,10 @@ class TestIndex:
             (3, (1, 4, 7, 14)),
         ),
     )
-    def test_clauses_for_count(
+    def test_clauses_with_count(
         self, index: Index, count: int, clauses: tuple[int, ...]
     ) -> None:
-        assert index.clauses_for_count(count) == {index.clauses[i] for i in clauses}
+        assert index.clauses_with_count(count) == {index.clauses[i] for i in clauses}
 
     def test_push_pop_stack_len(self, index: Index) -> None:
         for clause in index.clauses:
@@ -105,27 +105,27 @@ class TestIndex:
         assert clause.assigned == [set(), set()]
 
         len_1_clauses = (0,)
-        assert index.clauses_for_count(1) == {index.clauses[i] for i in len_1_clauses}
+        assert index.clauses_with_count(1) == {index.clauses[i] for i in len_1_clauses}
         len_3_clauses = (1, 4, 7, 14)
-        assert index.clauses_for_count(3) == {index.clauses[i] for i in len_3_clauses}
+        assert index.clauses_with_count(3) == {index.clauses[i] for i in len_3_clauses}
 
         clause.assign(x3, ~x2)
         assert clause.unassigned == {~x1}
         assert clause.assigned == [set(), {~x2, x3}]
 
         len_1_clauses = (0, 1)
-        assert index.clauses_for_count(1) == {index.clauses[i] for i in len_1_clauses}
+        assert index.clauses_with_count(1) == {index.clauses[i] for i in len_1_clauses}
         len_3_clauses = (4, 7, 14)
-        assert index.clauses_for_count(3) == {index.clauses[i] for i in len_3_clauses}
+        assert index.clauses_with_count(3) == {index.clauses[i] for i in len_3_clauses}
 
         index.pop()
         assert clause.unassigned == {~x1, ~x2, x3}
         assert clause.assigned == [set()]
 
         len_1_clauses = (0,)
-        assert index.clauses_for_count(1) == {index.clauses[i] for i in len_1_clauses}
+        assert index.clauses_with_count(1) == {index.clauses[i] for i in len_1_clauses}
         len_3_clauses = (1, 4, 7, 14)
-        assert index.clauses_for_count(3) == {index.clauses[i] for i in len_3_clauses}
+        assert index.clauses_with_count(3) == {index.clauses[i] for i in len_3_clauses}
 
 
 class TestIndexClause:

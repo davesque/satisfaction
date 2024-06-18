@@ -45,10 +45,10 @@ class Index:
             for lit in clause.unassigned:
                 self.clauses_by_lit[lit].add(clause)
 
-    def clauses_for_lit(self, lit: Lit) -> set[IndexClause]:
+    def clauses_with_lit(self, lit: Lit) -> set[IndexClause]:
         return self.clauses_by_lit[lit] & self.unassigned_clauses
 
-    def clauses_for_count(self, count: int) -> set[IndexClause]:
+    def clauses_with_count(self, count: int) -> set[IndexClause]:
         return self.clauses_by_count[count] & self.unassigned_clauses
 
     def move(self, clause: IndexClause, prev_count: int, curr_count: int) -> None:
@@ -69,7 +69,9 @@ class Index:
         assigned = self.assigned_clauses.pop()
         self.unassigned_clauses.update(assigned)
 
-    def assign_clause(self, *clauses: IndexClause, check_unassigned: bool = True) -> None:
+    def assign_clause(
+        self, *clauses: IndexClause, check_unassigned: bool = True
+    ) -> None:
         to_assign = set(clauses)
 
         if check_unassigned:
