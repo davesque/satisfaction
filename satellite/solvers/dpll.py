@@ -1,53 +1,14 @@
 from collections import defaultdict
 import logging
-import random
-from typing import Callable
 
 from satellite.assignments import Assignments
-from satellite.expr import And, CNF, Connective, Expr, Lit, Not, Or, Var
+from satellite.choice import common_lit
+from satellite.expr import And, CNF, Lit, Or
+from satellite.typing import ChooseLit
 
 from .solver import Solver
 
 logger = logging.getLogger(__name__)
-
-
-type ChooseLit = Callable[[CNF], Lit]
-
-
-def count_lits(expr: Expr, counter: dict[Var, int]) -> None:
-    match expr:
-        case Var(_):
-            # if name.startswith("x"):
-            counter[expr] += 1
-        case Not(p):
-            count_lits(p, counter)
-        case Connective(args):
-            for arg in args:
-                count_lits(arg, counter)
-
-
-def common_lit(expr: CNF) -> Lit:
-    counter = defaultdict(lambda: 0)
-    count_lits(expr, counter)
-
-    counts = sorted(counter.items(), key=lambda i: i[1], reverse=True)
-    return counts[0][0]
-
-
-def first_lit(expr: CNF) -> Lit:
-    or_expr = expr.args[0]
-    return or_expr.args[0]
-
-
-def last_lit(expr: CNF) -> Lit:
-    or_expr = expr.args[-1]
-    return or_expr.args[-1]
-
-
-def random_lit(expr: CNF) -> Lit:
-    or_expr = random.choice(expr.args)
-    lit = random.choice(or_expr.args)
-    return lit
 
 
 class DPLL(Solver):
