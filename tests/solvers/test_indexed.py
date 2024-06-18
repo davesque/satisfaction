@@ -2,7 +2,7 @@ import pytest
 
 from satellite.examples.queens import Queens
 from satellite.expr import And, Or, var
-from satellite.indexed import DPLL
+from satellite.solvers.indexed import DPLL
 from satellite.tseitin import Tseitin
 from satellite.utils import numbered_var
 

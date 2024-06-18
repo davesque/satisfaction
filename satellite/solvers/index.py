@@ -1,7 +1,7 @@
 from __future__ import annotations
 from collections import defaultdict
 
-from .expr import CNF, Clause, Lit
+from satellite.expr import CNF, Clause, Lit
 
 
 def set_repr(s: set) -> str:

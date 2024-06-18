@@ -1,7 +1,8 @@
 import logging
 
 from satellite.expr import CNF, Lit
-from satellite.index import Index
+
+from .index import Index
 
 logger = logging.getLogger(__name__)
 

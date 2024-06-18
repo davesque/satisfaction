@@ -3,7 +3,7 @@ import logging
 import pytest
 
 from satellite.expr import Implies, Lit, var
-from satellite.index import Index
+from satellite.solvers.index import Index
 from satellite.tseitin import Tseitin
 from satellite.utils import numbered_var
 
@@ -106,7 +106,7 @@ class TestIndex:
 
         len_1_clauses = (0,)
         assert index.clauses_for_count(1) == {index.clauses[i] for i in len_1_clauses}
-        len_3_clauses =(1, 4, 7, 14)
+        len_3_clauses = (1, 4, 7, 14)
         assert index.clauses_for_count(3) == {index.clauses[i] for i in len_3_clauses}
 
         clause.assign(x3, ~x2)
@@ -115,7 +115,7 @@ class TestIndex:
 
         len_1_clauses = (0, 1)
         assert index.clauses_for_count(1) == {index.clauses[i] for i in len_1_clauses}
-        len_3_clauses =(4, 7, 14)
+        len_3_clauses = (4, 7, 14)
         assert index.clauses_for_count(3) == {index.clauses[i] for i in len_3_clauses}
 
         index.pop()
@@ -124,7 +124,7 @@ class TestIndex:
 
         len_1_clauses = (0,)
         assert index.clauses_for_count(1) == {index.clauses[i] for i in len_1_clauses}
-        len_3_clauses =(1, 4, 7, 14)
+        len_3_clauses = (1, 4, 7, 14)
         assert index.clauses_for_count(3) == {index.clauses[i] for i in len_3_clauses}
 
 
