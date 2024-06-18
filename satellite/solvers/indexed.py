@@ -4,6 +4,8 @@ import logging
 
 from satellite.expr import CNF, Clause, Lit
 
+from .solver import Solver
+
 logger = logging.getLogger(__name__)
 
 
@@ -12,7 +14,7 @@ def set_repr(s: set) -> str:
     return f"{{{els_repr}}}"
 
 
-class DPLL:
+class DPLL(Solver):
     __slots__ = ("expr", "index")
 
     expr: CNF

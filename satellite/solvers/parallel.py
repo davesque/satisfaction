@@ -5,6 +5,8 @@ from typing import Callable
 
 from satellite.expr import And, CNF, Connective, Expr, Lit, Not, Or, Var
 
+from .solver import Solver
+
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +49,7 @@ def random_lit(expr: CNF) -> Lit:
     return lit
 
 
-class DPLL:
+class DPLL(Solver):
     __slots__ = ("expr", "choose_lit")
 
     expr: CNF
