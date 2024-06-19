@@ -10,12 +10,9 @@ from .solver import Solver
 logger = logging.getLogger(__name__)
 
 
-def optional_set_repr(s: set | None) -> str:
-    if s is None:
-        return r"{}"
-    else:
-        els_repr = ", ".join(sorted(map(repr, s)))
-        return f"{{{els_repr}}}"
+def set_repr(s: set) -> str:
+    els_repr = ", ".join(sorted(map(repr, s)))
+    return f"{{{els_repr}}}"
 
 
 class DPLL(Solver):
@@ -49,7 +46,7 @@ class DPLL(Solver):
         # eliminated from a disjunction was determined to have a truth value of
         # `false`.  Therefore, the parent disjunction evaluates to `false` and the
         # root conjunction also evaluate to `false`.
-        if len(self.clauses.clauses_with_count(0)) > 0:
+        if len(self.clauses.with_count(0)) > 0:
             return False
 
         first_clause = next(iter(self.clauses.els))
@@ -73,7 +70,7 @@ class DPLL(Solver):
 
     def find_units(self) -> set[Lit]:
         units = {}
-        for clause in self.clauses.clauses_with_count(1):
+        for clause in self.clauses.with_count(1):
             lit = next(iter(clause.els))
             # We only want to propagate one polarity of a literal at a time.
             # This avoids accidentally claiming things like (P & ~P) are
@@ -86,52 +83,52 @@ class DPLL(Solver):
         logger.debug("assigning unit literals: %s", units)
 
         for unit in units:
-            clauses = self.clauses.clauses_with_lit(unit)
+            clauses = self.clauses.with_lit(unit)
             self.clauses.difference_update(clauses)
 
             not_unit = {~unit}
-            for clause in self.clauses.clauses_with_lit(~unit):
+            for clause in self.clauses.with_lit(~unit):
                 clause.difference_update(not_unit)
 
 
 class Clauses(LayeredSet["Clause"]):
     __slots__ = (
         "clauses",
-        "clauses_by_lit",
-        "clauses_by_count",
+        "by_lit",
+        "by_count",
     )
 
     clauses: tuple[Clause, ...]
 
-    clauses_by_lit: dict[Lit, set[Clause]]
-    clauses_by_count: dict[int, set[Clause]]
+    by_lit: dict[Lit, set[Clause]]
+    by_count: dict[int, set[Clause]]
 
     def __init__(self, cnf: CNF) -> None:
         self.clauses = tuple(Clause(clause, self) for clause in cnf.args)
         super().__init__(set(self.clauses))
 
-        self.clauses_by_lit = defaultdict(set)
-        self.clauses_by_count = defaultdict(set)
-        self.clauses_by_count[0] = set()
+        self.by_lit = defaultdict(set)
+        self.by_count = defaultdict(set)
+        self.by_count[0] = set()
 
         self._build_indices()
 
     def _build_indices(self) -> None:
         for clause in self.clauses:
-            self.clauses_by_count[len(clause.els)].add(clause)
+            self.by_count[len(clause.els)].add(clause)
             for lit in clause.els:
-                self.clauses_by_lit[lit].add(clause)
+                self.by_lit[lit].add(clause)
 
-    def clauses_with_lit(self, lit: Lit) -> set[Clause]:
-        return self.clauses_by_lit[lit] & self.els
+    def with_lit(self, lit: Lit) -> set[Clause]:
+        return self.by_lit[lit] & self.els
 
-    def clauses_with_count(self, count: int) -> set[Clause]:
-        return self.clauses_by_count[count] & self.els
+    def with_count(self, count: int) -> set[Clause]:
+        return self.by_count[count] & self.els
 
     def move(self, clause: Clause, prev_count: int, curr_count: int) -> None:
         if prev_count != curr_count:
-            self.clauses_by_count[prev_count].remove(clause)
-            self.clauses_by_count[curr_count].add(clause)
+            self.by_count[prev_count].remove(clause)
+            self.by_count[curr_count].add(clause)
 
     def push_layer(self) -> None:
         super().push_layer()
@@ -147,28 +144,24 @@ class Clauses(LayeredSet["Clause"]):
 
 
 class Clause(LayeredSet[Lit]):
-    __slots__ = ("index",)
+    __slots__ = ("clauses",)
 
-    index: Clauses
+    clauses: Clauses
 
-    def __init__(self, clause: ClauseExpr, index: Clauses) -> None:
+    def __init__(self, clause: ClauseExpr, clauses: Clauses) -> None:
         super().__init__(set(clause.args))
-        self.index = index
+        self.clauses = clauses
 
     def pop_layer(self) -> None:
         prev_len = len(self.els)
         super().pop_layer()
         curr_len = len(self.els)
 
-        self.index.move(self, prev_len, curr_len)
+        self.clauses.move(self, prev_len, curr_len)
 
     def difference_update(self, to_remove: set[Lit]) -> None:
         prev_len = len(self.els)
         super().difference_update(to_remove)
         curr_len = len(self.els)
 
-        self.index.move(self, prev_len, curr_len)
-
-    def __repr__(self) -> str:
-        assigned_repr = ", ".join(map(optional_set_repr, self.assigned))
-        return f"{optional_set_repr(self.unassigned)} ({assigned_repr})"
+        self.clauses.move(self, prev_len, curr_len)

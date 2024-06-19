@@ -3,7 +3,7 @@ import logging
 import pytest
 
 from satellite.expr import Implies, Lit, var
-from satellite.solvers.indexed import DPLL, Index
+from satellite.solvers.indexed import DPLL, Clauses
 from satellite.tseitin import Tseitin
 from satellite.utils import numbered_var
 
@@ -23,19 +23,19 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture
-def index() -> Index:
-    return Index(cnf)
+def index() -> Clauses:
+    return Clauses(cnf)
 
 
 class TestIndexed(BaseSuite):
     solver_cls = DPLL
-    queens = (8, True)
+    queens = (12, True)
 
 
 class TestIndex:
-    def test_init(self, index: Index) -> None:
+    def test_init(self, index: Clauses) -> None:
         assert len(index.clauses) == len(cnf.args)
-        assert sorted(index.clauses_by_lit.keys(), key=repr) == [
+        assert sorted(index.by_lit.keys(), key=repr) == [
             p,
             q,
             r,
@@ -53,7 +53,7 @@ class TestIndex:
             ~x4,
             ~x5,
         ]
-        assert sorted(index.clauses_by_count.keys()) == [0, 1, 2, 3]
+        assert sorted(index.by_count.keys()) == [0, 1, 2, 3]
 
     @pytest.mark.parametrize(
         "lit,clauses",
@@ -77,9 +77,9 @@ class TestIndex:
         ),
     )
     def test_clauses_with_lit(
-        self, index: Index, lit: Lit, clauses: tuple[int, ...]
+        self, index: Clauses, lit: Lit, clauses: tuple[int, ...]
     ) -> None:
-        assert index.clauses_with_lit(lit) == {index.clauses[i] for i in clauses}
+        assert index.with_lit(lit) == {index.clauses[i] for i in clauses}
 
     @pytest.mark.parametrize(
         "count,clauses",
@@ -90,54 +90,35 @@ class TestIndex:
         ),
     )
     def test_clauses_with_count(
-        self, index: Index, count: int, clauses: tuple[int, ...]
+        self, index: Clauses, count: int, clauses: tuple[int, ...]
     ) -> None:
-        assert index.clauses_with_count(count) == {index.clauses[i] for i in clauses}
+        assert index.with_count(count) == {index.clauses[i] for i in clauses}
 
-    def test_push_pop_stack_len(self, index: Index) -> None:
-        for clause in index.clauses:
-            assert len(clause.assigned) == 1
-        index.push()
-        for clause in index.clauses:
-            assert len(clause.assigned) == 2
-        index.pop()
-        for clause in index.clauses:
-            assert len(clause.assigned) == 1
-
-    def test_push_pop_mutation(self, index: Index) -> None:
+    def test_push_pop_mutation(self, index: Clauses) -> None:
         clause = index.clauses[1]
 
-        index.push()
-        assert clause.unassigned == {~x1, ~x2, x3}
-        assert clause.assigned == [set(), set()]
+        index.push_layer()
+        assert clause.els == {~x1, ~x2, x3}
+        assert clause.depth == 1
 
         len_1_clauses = (0,)
-        assert index.clauses_with_count(1) == {index.clauses[i] for i in len_1_clauses}
+        assert index.with_count(1) == {index.clauses[i] for i in len_1_clauses}
         len_3_clauses = (1, 4, 7, 14)
-        assert index.clauses_with_count(3) == {index.clauses[i] for i in len_3_clauses}
+        assert index.with_count(3) == {index.clauses[i] for i in len_3_clauses}
 
-        clause.assign(x3, ~x2)
-        assert clause.unassigned == {~x1}
-        assert clause.assigned == [set(), {~x2, x3}]
+        clause.difference_update({x3, ~x2})
+        assert clause.els == {~x1}
 
         len_1_clauses = (0, 1)
-        assert index.clauses_with_count(1) == {index.clauses[i] for i in len_1_clauses}
+        assert index.with_count(1) == {index.clauses[i] for i in len_1_clauses}
         len_3_clauses = (4, 7, 14)
-        assert index.clauses_with_count(3) == {index.clauses[i] for i in len_3_clauses}
+        assert index.with_count(3) == {index.clauses[i] for i in len_3_clauses}
 
-        index.pop()
-        assert clause.unassigned == {~x1, ~x2, x3}
-        assert clause.assigned == [set()]
+        index.pop_layer()
+        assert clause.els == {~x1, ~x2, x3}
+        assert clause.depth == 0
 
         len_1_clauses = (0,)
-        assert index.clauses_with_count(1) == {index.clauses[i] for i in len_1_clauses}
+        assert index.with_count(1) == {index.clauses[i] for i in len_1_clauses}
         len_3_clauses = (1, 4, 7, 14)
-        assert index.clauses_with_count(3) == {index.clauses[i] for i in len_3_clauses}
-
-
-class TestIndexClause:
-    def test_repr(self, index: Index) -> None:
-        clause = index.clauses[1]
-        clause.assign(x3)
-
-        assert repr(index.clauses[1]) == r"{~x1, ~x2} ({x3})"
+        assert index.with_count(3) == {index.clauses[i] for i in len_3_clauses}
