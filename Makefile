@@ -1,6 +1,7 @@
 VENV := venv
 PIP := $(VENV)/bin/pip
 PYTEST := $(VENV)/bin/pytest
+RUFF := $(VENV)/bin/ruff
 
 .PHONY: setup
 setup:
@@ -11,6 +12,11 @@ setup:
 .PHONY: test
 test:
 	$(PYTEST) -vv --cov-report term-missing --cov=satellite .
+
+.PHONY: lint
+lint:
+	$(RUFF) format --diff .
+	$(RUFF) check .
 
 .PHONY: clean
 clean:
