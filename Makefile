@@ -11,3 +11,7 @@ setup:
 .PHONY: test
 test:
 	$(PYTEST) -vv --cov-report term-missing --cov=satellite .
+
+.PHONY: clean
+clean:
+	rm -r $(VENV) *.egg-info
