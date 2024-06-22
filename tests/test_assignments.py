@@ -1,8 +1,8 @@
 import pytest
 
-from satellite.assignments import Assignments
-from satellite.exceptions import ConflictError
-from satellite.expr import Lit, Not, Var, var
+from satisfaction.assignments import Assignments
+from satisfaction.exceptions import ConflictError
+from satisfaction.expr import Lit, Not, Var, var
 
 
 @pytest.fixture

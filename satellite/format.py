@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from satellite.expr import Expr, Var, Not, Connective, And, Or, Implies, Equivalent
+from satisfaction.expr import Expr, Var, Not, Connective, And, Or, Implies, Equivalent
 
 
 class Formatter:

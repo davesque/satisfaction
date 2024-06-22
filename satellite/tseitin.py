@@ -1,6 +1,6 @@
 from typing import Iterator
 
-from satellite.expr import (
+from satisfaction.expr import (
     And,
     CNF,
     Connective,
@@ -12,7 +12,7 @@ from satellite.expr import (
     Or,
     Var,
 )
-from satellite.utils import letters
+from satisfaction.utils import letters
 
 
 class Tseitin:

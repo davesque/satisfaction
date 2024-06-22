@@ -1,10 +1,10 @@
 from collections import defaultdict
 import logging
 
-from satellite.assignments import Assignments
-from satellite.choice import common_lit
-from satellite.expr import And, CNF, Lit, Or
-from satellite.typing import ChooseLit
+from satisfaction.assignments import Assignments
+from satisfaction.choice import common_lit
+from satisfaction.expr import And, CNF, Lit, Or
+from satisfaction.typing import ChooseLit
 
 from .solver import Solver
 

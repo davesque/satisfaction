@@ -1,6 +1,6 @@
 import pytest
 
-from satellite.layered import LayeredSet
+from satisfaction.layered import LayeredSet
 
 
 @pytest.fixture

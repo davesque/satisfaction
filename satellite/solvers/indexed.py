@@ -2,8 +2,8 @@ from __future__ import annotations
 from collections import defaultdict
 import logging
 
-from satellite.expr import CNF, Clause as ClauseExpr, Lit
-from satellite.layered import LayeredSet
+from satisfaction.expr import CNF, Clause as ClauseExpr, Lit
+from satisfaction.layered import LayeredSet
 
 from .solver import Solver
 

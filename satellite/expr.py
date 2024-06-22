@@ -2,7 +2,7 @@ from __future__ import annotations
 import functools
 from typing import Any, Callable
 
-from satellite.utils import SlotClass
+from satisfaction.utils import SlotClass
 
 
 def require_expr[
@@ -52,7 +52,7 @@ class Expr(SlotClass):
         return hash((type(self),) + tuple(self.__values__()))
 
     def __repr__(self) -> str:
-        from satellite.format import format_expr
+        from satisfaction.format import format_expr
 
         return format_expr(self)
 

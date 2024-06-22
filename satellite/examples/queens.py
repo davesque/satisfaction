@@ -1,7 +1,7 @@
 from typing import Iterator
 
-from satellite.expr import And, Or, Var
-from satellite.utils import letters
+from satisfaction.expr import And, Or, Var
+from satisfaction.utils import letters
 
 
 def partitions(vars: tuple[Var, ...]) -> Iterator[tuple[Var, tuple[Var, ...]]]:

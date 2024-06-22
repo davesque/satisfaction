@@ -1,7 +1,7 @@
 import pytest
 
-from satellite.expr import Equivalent, Expr, Implies, Var
-from satellite.format import Formatter, format_expr, pythonic, standard, default, set_formatter
+from satisfaction.expr import Equivalent, Expr, Implies, Var
+from satisfaction.format import Formatter, format_expr, pythonic, standard, default, set_formatter
 
 w = Var("w")
 x = Var("x")

@@ -1,6 +1,6 @@
-from satellite.expr import And, Equivalent, Implies, Or, Var, var
-from satellite.tseitin import Tseitin
-from satellite.utils import numbered_var
+from satisfaction.expr import And, Equivalent, Implies, Or, Var, var
+from satisfaction.tseitin import Tseitin
+from satisfaction.utils import numbered_var
 
 
 def test_tseitin_transform() -> None:

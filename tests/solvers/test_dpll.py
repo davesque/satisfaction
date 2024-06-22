@@ -1,5 +1,5 @@
-from satellite.expr import And, Or, var
-from satellite.solvers.dpll import DPLL
+from satisfaction.expr import And, Or, var
+from satisfaction.solvers.dpll import DPLL
 
 from .base_suite import BaseSuite
 

@@ -1,6 +1,6 @@
 import pytest
 
-from satellite.expr import (
+from satisfaction.expr import (
     And,
     Not,
     Or,

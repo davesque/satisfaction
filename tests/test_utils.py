@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 import pytest
 
-from satellite import utils
+from satisfaction import utils
 
 
 def test_chunks() -> None:

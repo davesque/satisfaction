@@ -1,10 +1,10 @@
 import pytest
 
-from satellite.examples.queens import Queens
-from satellite.expr import And, Or, var
-from satellite.solvers.solver import Solver
-from satellite.tseitin import Tseitin
-from satellite.utils import numbered_var
+from satisfaction.examples.queens import Queens
+from satisfaction.expr import And, Or, var
+from satisfaction.solvers.solver import Solver
+from satisfaction.tseitin import Tseitin
+from satisfaction.utils import numbered_var
 
 x, y = var("x y")
 

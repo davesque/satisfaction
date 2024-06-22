@@ -2,10 +2,10 @@ import logging
 
 import pytest
 
-from satellite.expr import Implies, Lit, var
-from satellite.solvers.indexed import Clauses, DPLL
-from satellite.tseitin import Tseitin
-from satellite.utils import numbered_var
+from satisfaction.expr import Implies, Lit, var
+from satisfaction.solvers.indexed import Clauses, DPLL
+from satisfaction.tseitin import Tseitin
+from satisfaction.utils import numbered_var
 
 from .base_suite import BaseSuite
 

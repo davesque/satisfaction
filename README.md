@@ -1,4 +1,4 @@
-# satellite
+# satisfaction
 
 A toy implementation of the DPLL SAT algorithm written in Python.
 
@@ -24,8 +24,8 @@ at the test suite.
 ## Setup
 
 ```
-git clone git@github.com:davesque/satellite.git
-cd satellite
+git clone git@github.com:davesque/satisfaction.git
+cd satisfaction
 make
 ```
 

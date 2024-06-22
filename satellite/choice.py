@@ -1,7 +1,7 @@
 from collections import defaultdict
 import random
 
-from satellite.expr import CNF, Connective, Expr, Lit, Not, Var
+from satisfaction.expr import CNF, Connective, Expr, Lit, Not, Var
 
 
 def count_lits(expr: Expr, counter: dict[Var, int]) -> None:

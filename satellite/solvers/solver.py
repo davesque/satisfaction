@@ -1,6 +1,6 @@
 import abc
 
-from satellite.expr import CNF
+from satisfaction.expr import CNF
 
 
 class Solver(abc.ABC):
