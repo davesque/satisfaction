@@ -1,4 +1,4 @@
-from satisfaction.expr import And, Equivalent, Implies, Or, Var, var
+from satisfaction.expr import Equivalent, Implies, Or, var
 from satisfaction.tseitin import Tseitin
 from satisfaction.utils import numbered_var
 

@@ -5,13 +5,13 @@ from typing import Any, Callable
 from satisfaction.utils import SlotClass
 
 
-def require_expr[
-    T: "Expr", U: "Expr"
-](old_fn: Callable[[T, Expr], U]) -> Callable[[T, Any], U]:
+def require_expr[T: "Expr", U: "Expr"](
+    old_fn: Callable[[T, Expr], U],
+) -> Callable[[T, Any], U]:
     @functools.wraps(old_fn)
     def new_fn(self: T, other: Any) -> U:
         if not isinstance(other, Expr):
-            raise TypeError(f"cannot combine expr and non-expr")
+            raise TypeError("cannot combine expr and non-expr")
 
         return old_fn(self, other)
 

@@ -2,7 +2,7 @@ import pytest
 
 from satisfaction.assignments import Assignments
 from satisfaction.exceptions import ConflictError
-from satisfaction.expr import Lit, Not, Var, var
+from satisfaction.expr import Lit, Not, var
 
 
 @pytest.fixture

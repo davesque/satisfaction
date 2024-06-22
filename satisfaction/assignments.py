@@ -1,5 +1,5 @@
 from .exceptions import ConflictError
-from .expr import Clause, Lit, Not, Var, Var
+from .expr import Clause, Lit, Not, Var
 
 type Subject = Clause | Var
 type Facts = dict[Clause | Var, bool]
