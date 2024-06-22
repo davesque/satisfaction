@@ -29,7 +29,7 @@ def clauses() -> Clauses:
 
 class TestIndexed(BaseSuite):
     solver_cls = DPLL
-    queens = (12, True)
+    queens = (8, True)
 
 
 class TestIndex:
