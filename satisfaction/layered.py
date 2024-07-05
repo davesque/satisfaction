@@ -31,7 +31,7 @@ class LayeredSet[T]:
         self.depth -= 1
 
     @property
-    def _removed_in_layer(self) -> set[T]:
+    def _changed_in_layer(self) -> set[T]:
         if self._changed is None:
             # invariant:
             # if self._changed is not None, then len(self._changed) > 0
@@ -53,5 +53,5 @@ class LayeredSet[T]:
             # if a layer exists in self._changed, then it must not be empty
             return
 
-        self._removed_in_layer.update(to_remove)
+        self._changed_in_layer.update(to_remove)
         self.els.difference_update(to_remove)

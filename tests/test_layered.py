@@ -23,18 +23,18 @@ class TestLayeredSet:
         with pytest.raises(IndexError):
             ls.pop_layer()
 
-    def test_removed_in_layer(self, ls: LayeredSet) -> None:
+    def test_changed_in_layer(self, ls: LayeredSet) -> None:
         # invariants across public API methods would normally prevent empty
         # layers from existing, but we're doing a bit of white box testing here
 
-        first = ls._removed_in_layer
-        assert ls._removed_in_layer is first
+        first = ls._changed_in_layer
+        assert ls._changed_in_layer is first
         assert ls._changed == [(0, set())]
         assert ls._changed == [(0, first)]
 
         ls.push_layer()
-        second = ls._removed_in_layer
-        assert ls._removed_in_layer is second
+        second = ls._changed_in_layer
+        assert ls._changed_in_layer is second
         assert ls._changed == [(0, set()), (1, set())]
         assert ls._changed == [(0, first), (1, second)]
 
