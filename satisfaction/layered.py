@@ -1,4 +1,7 @@
-class LayeredSet[T]:
+import abc
+
+
+class SetLayers[T](abc.ABC):
     __slots__ = ("els", "_changed", "depth")
 
     els: set[T]
@@ -20,7 +23,7 @@ class LayeredSet[T]:
         if self._changed is not None:
             changed_depth, changed = self._changed[-1]
             if changed_depth == self.depth:
-                self.els.update(changed)
+                self._reset_els(changed)
                 self._changed.pop()
 
             if len(self._changed) == 0:
@@ -46,12 +49,37 @@ class LayeredSet[T]:
 
         return changed
 
-    def difference_update(self, to_remove: set[T]) -> None:
-        to_remove = to_remove & self.els
-        if len(to_remove) == 0:
+    def modify(self, changed: set[T]) -> None:
+        changed = self._filter_changed(changed)
+        if len(changed) == 0:
             # invariant:
             # if a layer exists in self._changed, then it must not be empty
             return
 
-        self._changed_in_layer.update(to_remove)
-        self.els.difference_update(to_remove)
+        self._changed_in_layer.update(changed)
+        self._update_els(changed)
+
+    @abc.abstractmethod
+    def _reset_els(self, changed: set[T]) -> None: ...
+
+    @abc.abstractmethod
+    def _update_els(self, changed: set[T]) -> None: ...
+
+    @abc.abstractmethod
+    def _filter_changed(self, changed: set[T]) -> set[T]: ...
+
+
+class RemoveLayers[T](SetLayers[T]):
+    __slots__ = ()
+
+    def _reset_els(self, changed: set[T]) -> None:
+        self.els.update(changed)
+
+    def _update_els(self, changed: set[T]) -> None:
+        self.els.difference_update(changed)
+
+    def _filter_changed(self, changed: set[T]) -> set[T]:
+        return changed & self.els
+
+    def difference_update(self, changed: set[T]) -> None:
+        self.modify(changed)

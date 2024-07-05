@@ -3,7 +3,7 @@ from collections import defaultdict
 import logging
 
 from satisfaction.expr import CNF, Clause as ClauseExpr, Lit
-from satisfaction.layered import LayeredSet
+from satisfaction.layered import RemoveLayers
 
 from .solver import Solver
 
@@ -91,7 +91,7 @@ class DPLL(Solver):
                 clause.difference_update(not_unit)
 
 
-class Clauses(LayeredSet["Clause"]):
+class Clauses(RemoveLayers["Clause"]):
     __slots__ = (
         "clauses",
         "by_lit",
@@ -143,7 +143,7 @@ class Clauses(LayeredSet["Clause"]):
             clause.pop_layer()
 
 
-class Clause(LayeredSet[Lit]):
+class Clause(RemoveLayers[Lit]):
     __slots__ = ("clauses",)
 
     clauses: Clauses
