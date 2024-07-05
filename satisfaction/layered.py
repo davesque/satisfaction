@@ -83,3 +83,19 @@ class RemoveLayers[T](SetLayers[T]):
 
     def difference_update(self, changed: set[T]) -> None:
         self.modify(changed)
+
+
+class AddLayers[T](SetLayers[T]):
+    __slots__ = ()
+
+    def _reset_els(self, changed: set[T]) -> None:
+        self.els.difference_update(changed)
+
+    def _update_els(self, changed: set[T]) -> None:
+        self.els.update(changed)
+
+    def _filter_changed(self, changed: set[T]) -> set[T]:
+        return changed - self.els
+
+    def update(self, changed: set[T]) -> None:
+        self.modify(changed)

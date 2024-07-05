@@ -1,9 +1,9 @@
 from collections import defaultdict
 import logging
 
-from satisfaction.assignments import Assignments
 from satisfaction.choice import common_lit
 from satisfaction.expr import And, CNF, Lit, Or
+from satisfaction.layered import AddLayers
 from satisfaction.typing import ChooseLit
 
 from .solver import Solver
@@ -16,11 +16,12 @@ class DPLL(Solver):
 
     expr: CNF
     choose_lit: ChooseLit
+    assignments: AddLayers
 
     def __init__(self, expr: CNF, choose_lit: ChooseLit = common_lit) -> None:
         self.expr = expr
         self.choose_lit = choose_lit
-        self.assignments = Assignments()
+        self.assignments = AddLayers(set())
 
     def check(self, expr: CNF | None = None) -> bool:
         """
@@ -58,16 +59,16 @@ class DPLL(Solver):
         lit = self.choose_lit(expr)
 
         logger.debug("+++++++++++++ branching +++++++++++++")
-        self.assignments.push()
+        self.assignments.push_layer()
         if self.check(self.unit_propagate(lit, expr)):
             return True
-        self.assignments.pop()
+        self.assignments.pop_layer()
 
         logger.debug("------------ backtracking -----------")
-        self.assignments.push()
+        self.assignments.push_layer()
         if self.check(self.unit_propagate(~lit, expr)):
             return True
-        self.assignments.pop()
+        self.assignments.pop_layer()
 
         return False
 
@@ -79,7 +80,7 @@ class DPLL(Solver):
 
     def unit_propagate(self, lit: Lit, and_expr: CNF) -> CNF:
         logger.debug("assigning unit literal: %s", lit)
-        self.assignments.assign(lit, True)
+        self.assignments.update({lit})
 
         not_lit = ~lit
         and_args = []
@@ -116,7 +117,7 @@ class DPLL(Solver):
 
     def pure_literal_assign(self, lit: Lit, and_expr: CNF) -> CNF:
         logger.debug("assigning pure literal: %s", lit)
-        self.assignments.assign(lit, True)
+        self.assignments.update({lit})
 
         and_args = []
         for or_expr in and_expr.args:

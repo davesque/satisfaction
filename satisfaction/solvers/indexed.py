@@ -3,7 +3,7 @@ from collections import defaultdict
 import logging
 
 from satisfaction.expr import CNF, Clause as ClauseExpr, Lit
-from satisfaction.layered import RemoveLayers
+from satisfaction.layered import RemoveLayers, AddLayers
 
 from .solver import Solver
 
@@ -16,13 +16,16 @@ def set_repr(s: set) -> str:
 
 
 class DPLL(Solver):
-    __slots__ = ("expr", "clauses")
+    __slots__ = ("expr", "clauses", "assignments")
 
     expr: CNF
+    clauses: Clauses
+    assignments: AddLayers
 
     def __init__(self, expr: CNF) -> None:
         self.expr = expr
         self.clauses = Clauses(expr)
+        self.assignments = AddLayers(set())
 
     def check(self) -> bool:
         """
@@ -53,17 +56,21 @@ class DPLL(Solver):
         lit = next(iter(first_clause.els))
 
         logger.debug("+++++++++++++ branching +++++++++++++")
+        self.assignments.push_layer()
         self.clauses.push_layer()
         self.unit_propagate(lit)
         if self.check():
             return True
+        self.assignments.pop_layer()
         self.clauses.pop_layer()
 
         logger.debug("------------ backtracking -----------")
+        self.assignments.push_layer()
         self.clauses.push_layer()
         self.unit_propagate(~lit)
         if self.check():
             return True
+        self.assignments.pop_layer()
         self.clauses.pop_layer()
 
         return False
@@ -81,6 +88,7 @@ class DPLL(Solver):
 
     def unit_propagate(self, *units: Lit) -> None:
         logger.debug("assigning unit literals: %s", units)
+        self.assignments.update(set(units))
 
         for unit in units:
             clauses = self.clauses.with_lit(unit)
