@@ -11,7 +11,7 @@ def ls() -> LayeredSet:
 class TestLayeredSet:
     def test_init(self, ls: LayeredSet) -> None:
         assert ls.els == {1, 2, 3, 4}
-        assert ls._removed is None
+        assert ls._changed is None
         assert ls.depth == 0
 
     def test_push_pop_depth(self, ls: LayeredSet) -> None:
@@ -29,55 +29,55 @@ class TestLayeredSet:
 
         first = ls._removed_in_layer
         assert ls._removed_in_layer is first
-        assert ls._removed == [(0, set())]
-        assert ls._removed == [(0, first)]
+        assert ls._changed == [(0, set())]
+        assert ls._changed == [(0, first)]
 
         ls.push_layer()
         second = ls._removed_in_layer
         assert ls._removed_in_layer is second
-        assert ls._removed == [(0, set()), (1, set())]
-        assert ls._removed == [(0, first), (1, second)]
+        assert ls._changed == [(0, set()), (1, set())]
+        assert ls._changed == [(0, first), (1, second)]
 
     def test_api(self, ls: LayeredSet) -> None:
         ls.push_layer()
         assert ls.els == {1, 2, 3, 4}
-        assert ls._removed is None
+        assert ls._changed is None
         assert ls.depth == 1
 
         ls.difference_update({2, 3, 5})
         assert ls.els == {1, 4}
-        assert ls._removed == [(1, {2, 3})]
+        assert ls._changed == [(1, {2, 3})]
 
         ls.pop_layer()
         assert ls.els == {1, 2, 3, 4}
-        assert ls._removed is None
+        assert ls._changed is None
         assert ls.depth == 0
 
         ls.difference_update(set())
         assert ls.els == {1, 2, 3, 4}
-        assert ls._removed is None
+        assert ls._changed is None
         assert ls.depth == 0
 
         ls.difference_update({5, 6})
         assert ls.els == {1, 2, 3, 4}
-        assert ls._removed is None
+        assert ls._changed is None
         assert ls.depth == 0
 
         ls.difference_update({1})
         assert ls.els == {2, 3, 4}
-        assert ls._removed == [(0, {1})]
+        assert ls._changed == [(0, {1})]
         assert ls.depth == 0
 
         ls.push_layer()
         ls.difference_update({2})
         assert ls.els == {3, 4}
-        assert ls._removed == [(0, {1}), (1, {2})]
+        assert ls._changed == [(0, {1}), (1, {2})]
         assert ls.depth == 1
 
         ls.push_layer()
         ls.difference_update({3, 4})
         assert ls.els == set()
-        assert ls._removed == [(0, {1}), (1, {2}), (2, {3, 4})]
+        assert ls._changed == [(0, {1}), (1, {2}), (2, {3, 4})]
         assert ls.depth == 2
 
         ls.pop_layer()

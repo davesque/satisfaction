@@ -1,13 +1,13 @@
 class LayeredSet[T]:
-    __slots__ = ("els", "_removed", "depth")
+    __slots__ = ("els", "_changed", "depth")
 
     els: set[T]
-    _removed: list[tuple[int, set[T]]] | None
+    _changed: list[tuple[int, set[T]]] | None
     depth: int
 
     def __init__(self, els: set[T]) -> None:
         self.els = els
-        self._removed = None
+        self._changed = None
         self.depth = 0
 
     def push_layer(self) -> None:
@@ -17,32 +17,32 @@ class LayeredSet[T]:
         if self.depth == 0:
             raise IndexError("cannot pop base layer")
 
-        if self._removed is not None:
-            removed_depth, removed = self._removed[-1]
+        if self._changed is not None:
+            removed_depth, removed = self._changed[-1]
             if removed_depth == self.depth:
                 self.els.update(removed)
-                self._removed.pop()
+                self._changed.pop()
 
-            if len(self._removed) == 0:
+            if len(self._changed) == 0:
                 # invariant:
-                # if self._removed is not None, then len(self._removed) > 0
-                self._removed = None
+                # if self._changed is not None, then len(self._changed) > 0
+                self._changed = None
 
         self.depth -= 1
 
     @property
     def _removed_in_layer(self) -> set[T]:
-        if self._removed is None:
+        if self._changed is None:
             # invariant:
-            # if self._removed is not None, then len(self._removed) > 0
+            # if self._changed is not None, then len(self._changed) > 0
             removed = set()
-            self._removed = [(self.depth, removed)]
+            self._changed = [(self.depth, removed)]
             return removed
 
-        removed_depth, removed = self._removed[-1]
+        removed_depth, removed = self._changed[-1]
         if removed_depth != self.depth:
             removed = set()
-            self._removed.append((self.depth, removed))
+            self._changed.append((self.depth, removed))
 
         return removed
 
@@ -50,7 +50,7 @@ class LayeredSet[T]:
         to_remove = to_remove & self.els
         if len(to_remove) == 0:
             # invariant:
-            # if a layer exists in self._removed, then it must not be empty
+            # if a layer exists in self._changed, then it must not be empty
             return
 
         self._removed_in_layer.update(to_remove)
