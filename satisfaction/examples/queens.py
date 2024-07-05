@@ -1,7 +1,18 @@
+from datetime import datetime
+import argparse
+import logging
+import re
 from typing import Iterator
 
 from satisfaction.expr import And, Or, Var
-from satisfaction.utils import letters
+from satisfaction.solvers.indexed import DPLL
+from satisfaction.tseitin import Tseitin
+from satisfaction.utils import chunks, letters, numbered_var
+
+logger = logging.getLogger(__name__)
+
+
+LIT_KEY_RE = re.compile(r"^([^\d]*)(\d*)")
 
 
 def partitions(vars: tuple[Var, ...]) -> Iterator[tuple[Var, tuple[Var, ...]]]:
@@ -97,3 +108,83 @@ class Queens:
         at_most_one_per_rdiag = And(*rdiag)
 
         return one_per_row & one_per_col & at_most_one_per_ldiag & at_most_one_per_rdiag
+
+
+def row_repr(row):
+    inner = "│".join(lit_repr(lit) for lit in row)
+    return f"│{inner}│"
+
+
+def fill_repr(pos, n):
+    match pos:
+        case "top":
+            left, mid, right = "┌┬┐"
+        case "bottom":
+            left, mid, right = "└┴┘"
+        case _:
+            left, mid, right = "├┼┤"
+
+    inner = mid.join(["───"] * n)
+    return f"{left}{inner}{right}"
+
+
+def lit_repr(lit):
+    if isinstance(lit, Var):
+        return " Q "
+    else:
+        return "   "
+
+
+def lit_sort_key(lit):
+    match = LIT_KEY_RE.match(lit.atom().name)
+    assert match is not None
+    return (match.group(1), int(match.group(2), 10))
+
+
+def run_queens(queens_n: int) -> None:
+    queens = Queens(queens_n)
+    queens_formula = queens.get_formula()
+
+    tseitin = Tseitin(queens_formula, rename_vars=False, name_gen=numbered_var("x", 0))
+    queens_cnf = tseitin.transform(sort=True)
+
+    dpll = DPLL(queens_cnf)
+    if dpll.check():
+        assignments = [lit for lit in dpll.assignments.els if not lit.atom().generated]
+        assignments.sort(key=lit_sort_key)
+        logger.info("satisfiable: %s", assignments)
+
+        lines = [fill_repr("top", queens_n)]
+        for row in chunks(assignments, queens_n):
+            lines.extend([row_repr(row), fill_repr("mid", queens_n)])
+        lines = lines[:-1]
+        lines.append(fill_repr("bottom", queens_n))
+        logger.info("placements:\n" + "\n".join(lines))
+    else:
+        logger.info("untsatisfiable")
+
+
+def chessboard_size(s: str) -> int:
+    n = int(s, 10)
+    if n < 2:
+        raise ValueError("not a valid chessboard size")
+
+    return n
+
+
+parser = argparse.ArgumentParser(
+    description="Determine if N queens can be placed on an NxN chessboard"
+)
+parser.add_argument("N", help="the size of the chessboard", type=chessboard_size)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+
+    args = parser.parse_args()
+
+    start = datetime.now()
+    run_queens(args.N)
+    end = datetime.now()
+
+    logger.info("took: %s", end - start)
