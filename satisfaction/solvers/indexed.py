@@ -159,9 +159,9 @@ class Clause(RemoveLayers[Lit]):
 
         self.clauses.move(self, prev_len, curr_len)
 
-    def difference_update(self, to_remove: set[Lit]) -> None:
+    def difference_update(self, changed: set[Lit]) -> None:
         prev_len = len(self.els)
-        super().difference_update(to_remove)
+        super().difference_update(changed)
         curr_len = len(self.els)
 
         self.clauses.move(self, prev_len, curr_len)
