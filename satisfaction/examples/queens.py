@@ -1,5 +1,5 @@
-from datetime import datetime
 import argparse
+from datetime import datetime
 import logging
 import re
 from typing import Iterator
@@ -12,7 +12,7 @@ from satisfaction.utils import chunks, letters, numbered_var
 logger = logging.getLogger(__name__)
 
 
-LIT_KEY_RE = re.compile(r"^([^\d]*)(\d*)")
+LIT_KEY_RE = re.compile(r"^([a-z]*)(\d*)$")
 
 
 def partitions(vars: tuple[Var, ...]) -> Iterator[tuple[Var, tuple[Var, ...]]]:
