@@ -39,18 +39,18 @@ class DPLL(Solver):
             for lit in pure_lits:
                 expr = self.pure_literal_assign(lit, expr)
 
-        # If the root conjunction is empty, this implies that the formula is
-        # satisfiable.  This follows from the fact that any clause that was
-        # eliminated from the root conjunction was determined to have a truth value
-        # of `true`. Therefore, the root conjunction also evaluates to true.
+        # If the root conjunction is empty, then the overall formula is
+        # satisfiable because any clause that was eliminated from the root
+        # conjunction had a truth value of `true`. Therefore, the root
+        # conjunction also evaluates to true.
         if len(expr.args) == 0:
             return True
 
-        # If any disjunctive clause is empty, this implies that the formula is not
-        # satisfiable.  This follows from the fact that any literal that was
-        # eliminated from a disjunction was determined to have a truth value of
-        # `false`.  Therefore, the parent disjunction evaluates to `false` and the
-        # root conjunction also evaluate to `false`.
+        # If any disjunctive clause is empty, then the overall formula is not
+        # satisfiable because any literal that was eliminated from a
+        # disjunction had a truth value of `false`. Therefore, the parent
+        # disjunction evaluates to `false` and the root conjunction also
+        # evaluate to `false`.
         for or_expr in expr.args:
             if len(or_expr.args) == 0:
                 return False
