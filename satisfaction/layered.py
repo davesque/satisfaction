@@ -18,9 +18,9 @@ class LayeredSet[T]:
             raise IndexError("cannot pop base layer")
 
         if self._changed is not None:
-            removed_depth, removed = self._changed[-1]
-            if removed_depth == self.depth:
-                self.els.update(removed)
+            changed_depth, changed = self._changed[-1]
+            if changed_depth == self.depth:
+                self.els.update(changed)
                 self._changed.pop()
 
             if len(self._changed) == 0:
@@ -35,16 +35,16 @@ class LayeredSet[T]:
         if self._changed is None:
             # invariant:
             # if self._changed is not None, then len(self._changed) > 0
-            removed = set()
-            self._changed = [(self.depth, removed)]
-            return removed
+            changed = set()
+            self._changed = [(self.depth, changed)]
+            return changed
 
-        removed_depth, removed = self._changed[-1]
-        if removed_depth != self.depth:
-            removed = set()
-            self._changed.append((self.depth, removed))
+        changed_depth, changed = self._changed[-1]
+        if changed_depth != self.depth:
+            changed = set()
+            self._changed.append((self.depth, changed))
 
-        return removed
+        return changed
 
     def difference_update(self, to_remove: set[T]) -> None:
         to_remove = to_remove & self.els
