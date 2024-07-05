@@ -4,10 +4,10 @@ from satisfaction.expr import Equivalent, Expr, Implies, Var
 from satisfaction.format import (
     Formatter,
     format_expr,
+    formatter as module_formatter,
     pythonic,
-    standard,
-    default,
     set_formatter,
+    standard,
 )
 
 w = Var("w")
@@ -56,8 +56,8 @@ class TestFormatter:
     ),
 )
 def test_api(formatter: Formatter, expr: Expr, repr_str: str) -> None:
-    save_default = default
+    save_module_formatter = module_formatter
 
     set_formatter(formatter)
     assert format_expr(expr) == repr_str
-    set_formatter(save_default)
+    set_formatter(save_module_formatter)

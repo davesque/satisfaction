@@ -50,13 +50,13 @@ standard = Formatter(
     }
 )
 
-default = pythonic
+formatter = pythonic
 
 
-def set_formatter(formatter: Formatter) -> None:
-    global default
-    default = formatter
+def set_formatter(new_formatter: Formatter) -> None:
+    global formatter
+    formatter = new_formatter
 
 
 def format_expr(expr: Expr) -> str:
-    return default.format(expr)
+    return formatter.format(expr)
