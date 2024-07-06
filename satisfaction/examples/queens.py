@@ -138,7 +138,10 @@ def lit_repr(lit):
 def lit_sort_key(lit):
     match = LIT_KEY_RE.match(lit.atom().name)
     assert match is not None
-    return (match.group(1), int(match.group(2), 10))
+
+    alpha = match.group(1)
+    digit = match.group(2)
+    return (len(alpha), alpha, int(digit, 10))
 
 
 def run_queens(queens_n: int) -> None:
