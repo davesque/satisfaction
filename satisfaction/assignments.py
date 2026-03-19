@@ -1,3 +1,5 @@
+from typing import cast
+
 from .exceptions import ConflictError
 from .expr import Clause, Lit, Not, Var
 
@@ -35,7 +37,7 @@ class Assignments:
             case Not(Var(_) as var):
                 self.set(var, not x)
             case _:
-                self.set(expr, x)
+                self.set(cast(Subject, expr), x)
 
     def push(self) -> None:
         self.branches.append({})

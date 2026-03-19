@@ -1,0 +1,24 @@
+[project]
+name = "satisfaction"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+lint = [
+    "ruff",
+    "ty",
+]
+dev = [
+    { include-group = "test" },
+    { include-group = "lint" },
+    "ipython",
+    "ipdb",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,6 +1,6 @@
 from __future__ import annotations
 import functools
-from typing import Any, Callable
+from typing import Any, Callable, cast
 
 from satisfaction.utils import SlotClass
 
@@ -29,22 +29,22 @@ class Expr(SlotClass):
     @require_expr
     def __or__(self, other: Expr) -> Or:
         if isinstance(self, Or) and isinstance(other, Or):
-            return Or(*(self.args + other.args))
+            return Or(*cast(tuple[Expr, ...], self.args + other.args))
         elif isinstance(self, Or):
-            return Or(*(self.args + (other,)))
+            return Or(*cast(tuple[Expr, ...], self.args + (other,)))
         elif isinstance(other, Or):
-            return Or(*((self,) + other.args))
+            return Or(*cast(tuple[Expr, ...], (self,) + other.args))
         else:
             return Or(*(self, other))
 
     @require_expr
     def __and__(self, other: Expr) -> And:
         if isinstance(self, And) and isinstance(other, And):
-            return And(*(self.args + other.args))
+            return And(*cast(tuple[Expr, ...], self.args + other.args))
         elif isinstance(self, And):
-            return And(*(self.args + (other,)))
+            return And(*cast(tuple[Expr, ...], self.args + (other,)))
         elif isinstance(other, And):
-            return And(*((self,) + other.args))
+            return And(*cast(tuple[Expr, ...], (self,) + other.args))
         else:
             return And(*(self, other))
 
@@ -102,7 +102,7 @@ class Connective[T: Expr](Expr):
     args: tuple[T, ...]
 
     def __init__(self, *args: T):
-        super().__init__(args)
+        super().__init__(cast(Any, args))
 
 
 class And[T: Expr](Connective[T]):

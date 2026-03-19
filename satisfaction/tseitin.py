@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Any, Iterator, cast
 
 from satisfaction.expr import (
     And,
@@ -67,7 +67,7 @@ class Tseitin:
                 return self.lookup(expr) if self.rename_vars else expr
 
             case Not(Var(_) as var):
-                return Not(self.lookup(var)) if self.rename_vars else expr
+                return cast(Lit, Not(self.lookup(var)) if self.rename_vars else expr)
 
             case Not(p):
                 lhs = self.new_var()
@@ -75,13 +75,15 @@ class Tseitin:
 
             case Connective((p, q)):
                 lhs = self.new_var()
-                rhs = type(expr)(self.rewrite(p), self.rewrite(q))
+                ctor = cast(Any, type(expr))
+                rhs = ctor(self.rewrite(p), self.rewrite(q))
 
             # special case for left-associative operators with more than 2 args
             case And((*ps, q)) | Or((*ps, q)):
                 lhs = self.new_var()
-                rhs = type(expr)(
-                    self.rewrite(type(expr)(*ps)),
+                ctor = cast(Any, type(expr))
+                rhs = ctor(
+                    self.rewrite(ctor(*ps)),
                     self.rewrite(q),
                 )
 

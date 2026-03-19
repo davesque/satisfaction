@@ -1,23 +1,20 @@
-VENV := venv
-PIP := $(VENV)/bin/pip
-PYTEST := $(VENV)/bin/pytest
-RUFF := $(VENV)/bin/ruff
-
 .PHONY: setup
 setup:
-	python3 -mvenv $(VENV)
-	$(PIP) install --upgrade pip setuptools wheel
-	$(PIP) install -e .[dev]
+	uv sync --group dev
 
 .PHONY: test
 test:
-	$(PYTEST) -vv --cov-report term-missing --cov=satellite .
+	uv run pytest -vv --cov-report term-missing --cov=satisfaction .
 
 .PHONY: lint
 lint:
-	$(RUFF) format --diff .
-	$(RUFF) check .
+	uv run ruff format --diff .
+	uv run ruff check .
+
+.PHONY: typecheck
+typecheck:
+	uv run ty check satisfaction
 
 .PHONY: clean
 clean:
-	rm -r $(VENV) *.egg-info
+	rm -rf .venv *.egg-info

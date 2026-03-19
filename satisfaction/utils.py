@@ -1,5 +1,5 @@
 from textwrap import indent
-from typing import Any, Iterable, Iterator
+from typing import Any, Iterable, Iterator, cast
 
 
 def chunks[T](iter: Iterable[T], n: int) -> Iterator[tuple[T, ...]]:
@@ -87,7 +87,7 @@ class SlotClass:
     def __keys__(cls) -> Iterator[Any]:
         for parent_cls in reversed(cls.__mro__):
             try:
-                yield from parent_cls.__slots__
+                yield from cast(Any, parent_cls).__slots__
             except AttributeError:
                 pass
 
