@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A toy SAT solver implementing the DPLL algorithm in Python. Includes a Tseitin transformation for converting arbitrary boolean formulas to CNF, and an N-Queens example that encodes the problem as a SAT instance.
+A toy SAT solver implementing DPLL and CDCL algorithms in Python. Includes a Tseitin transformation for converting arbitrary boolean formulas to CNF, and an N-Queens example that encodes the problem as a SAT instance.
 
 ## Commands
 
@@ -26,6 +26,12 @@ Run the N-Queens example:
 uv run python -m satisfaction.examples.queens N
 ```
 
+Run the benchmark (compares all three solvers on N-Queens):
+```bash
+uv run python -m satisfaction.examples.benchmark
+uv run python -m satisfaction.examples.benchmark --runs 3  # averaged
+```
+
 ## Architecture
 
 **Expression tree** (`expr.py`): Boolean formula AST. `Var`, `Not`, `And`, `Or`, `Implies`, `Equivalent` form the tree. Operators `~`, `|`, `&` are overloaded on `Expr` for natural formula construction (e.g., `(~p | q) & (p | ~q)`). Type aliases `Lit`, `Clause`, `CNF` define the expected shapes for solver input.
@@ -35,9 +41,10 @@ uv run python -m satisfaction.examples.queens N
 **Solvers** (`solvers/`):
 - `solver.py`: Abstract `Solver` base class with `__init__(cnf)` and `check() -> bool`.
 - `dpll.py`: Naive DPLL — rebuilds the CNF expression tree on each recursive call. Supports pluggable literal choice heuristics (`ChooseLit` callback).
-- `indexed.py`: Optimized DPLL — uses `Clauses`/`Clause` wrapper classes with `by_lit` and `by_count` indices for O(1) unit clause lookup and fast propagation. Both solvers use layered sets for backtracking.
+- `indexed.py`: Optimized DPLL — uses `Clauses`/`Clause` wrapper classes with `by_lit` and `by_count` indices for O(1) unit clause lookup and fast propagation. Both DPLL solvers use layered sets for backtracking.
+- `cdcl.py`: CDCL solver — conflict-driven clause learning with 1-UIP conflict analysis, non-chronological backjumping, and learned clauses. Uses an assignment trail instead of layered sets, and a literal index for BCP.
 
-**Layered sets** (`layered.py`): `SetLayers` provides push/pop semantics for set modifications, enabling efficient backtracking. `AddLayers` tracks additions; `RemoveLayers` tracks removals. Used by both solvers to manage assignments and clause state across branch/backtrack cycles.
+**Layered sets** (`layered.py`): `SetLayers` provides push/pop semantics for set modifications, enabling efficient backtracking. `AddLayers` tracks additions; `RemoveLayers` tracks removals. Used by the DPLL solvers to manage assignments and clause state across branch/backtrack cycles.
 
 **Literal choice strategies** (`choice.py`): `common_lit`, `first_lit`, `last_lit`, `random_lit` — heuristics for the naive DPLL solver's branching decision.
 
