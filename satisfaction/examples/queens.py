@@ -181,7 +181,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument("N", help="the size of the chessboard", type=chessboard_size)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     logging.basicConfig(level=logging.DEBUG)
 
     args = parser.parse_args()

@@ -19,6 +19,9 @@ dev = [
     "ipdb",
 ]
 
+[tool.coverage.run]
+omit = ["satisfaction/examples/benchmark.py"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"

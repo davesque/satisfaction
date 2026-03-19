@@ -69,6 +69,13 @@ class CDCL(Solver):
         """
         Conflict-Driven Clause Learning (CDCL) SAT algorithm.
         """
+        # Enqueue initial unit clauses at decision level 0
+        for idx, clause in enumerate(self.clauses):
+            if len(clause) == 1:
+                lit = clause[0]
+                if lit.atom() not in self.assigns:
+                    self._enqueue(lit, idx)
+
         if self._propagate() is not None:
             return False
 

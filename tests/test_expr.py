@@ -2,6 +2,7 @@ import pytest
 
 from satisfaction.expr import (
     And,
+    Implies,
     Not,
     Or,
     Var,
@@ -56,6 +57,11 @@ class TestExpr:
         assert not_x.atom() == x
         with pytest.raises(ValueError):
             not_and.atom()
+
+    def test_binop(self) -> None:
+        impl = Implies(x, y)
+        assert impl.lhs == x
+        assert impl.rhs == y
 
 
 def test_var() -> None:

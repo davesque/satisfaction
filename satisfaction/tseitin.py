@@ -87,7 +87,7 @@ class Tseitin:
                     self.rewrite(q),
                 )
 
-            case _:
+            case _:  # pragma: no cover
                 assert False
 
         self.equivalences.add(Equivalent(lhs, rhs))
@@ -129,7 +129,7 @@ class Tseitin:
                 # = (~p | q) & (~p | r) & (~q | ~r | p)
                 return (~p | q) & (~p | r) & (~q | ~r | p)
 
-        assert False
+        assert False  # pragma: no cover
 
     def transform(self, sort: bool = False) -> CNF:
         if sort:

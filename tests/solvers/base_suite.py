@@ -22,6 +22,9 @@ class BaseSuite:
             And(x | x),
             And(x | ~x),
             And(~x | ~x),
+            # Requires backtracking: first branch on a variable
+            # leads to conflict, second branch succeeds
+            And(Or(x, y), Or(x, ~y), Or(~x, y)),
         ),
     )
     def test_sat(self, cnf: And) -> None:
