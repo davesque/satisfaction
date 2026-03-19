@@ -10,11 +10,6 @@ from .solver import Solver
 logger = logging.getLogger(__name__)
 
 
-def set_repr(s: set) -> str:
-    els_repr = ", ".join(sorted(map(repr, s)))
-    return f"{{{els_repr}}}"
-
-
 class DPLL(Solver):
     __slots__ = ("expr", "clauses", "assignments")
 
@@ -131,23 +126,33 @@ class Clauses(RemoveLayers["Clause"]):
         return self.by_lit[lit] & self.els
 
     def with_count(self, count: int) -> set[Clause]:
-        return self.by_count[count] & self.els
+        return set(self.by_count[count])
 
     def move(self, clause: Clause, prev_count: int, curr_count: int) -> None:
         if prev_count != curr_count:
             self.by_count[prev_count].remove(clause)
             self.by_count[curr_count].add(clause)
 
+    def _update_els(self, changed: set[Clause]) -> None:
+        for clause in changed:
+            self.by_count[len(clause.els)].remove(clause)
+        super()._update_els(changed)
+
+    def _reset_els(self, changed: set[Clause]) -> None:
+        super()._reset_els(changed)
+        for clause in changed:
+            self.by_count[len(clause.els)].add(clause)
+
     def push_layer(self) -> None:
         super().push_layer()
 
-        for clause in self.clauses:
+        for clause in self.els:
             clause.push_layer()
 
     def pop_layer(self) -> None:
         super().pop_layer()
 
-        for clause in self.clauses:
+        for clause in self.els:
             clause.pop_layer()
 
 
