@@ -9,20 +9,21 @@ A toy SAT solver implementing the DPLL algorithm in Python. Includes a Tseitin t
 ## Commands
 
 ```bash
-make setup    # Create venv and install deps (uses setup.py extras)
-make test     # Run tests with coverage (note: coverage target is "satellite", likely a typo for "satisfaction")
-make lint     # Check formatting and linting with ruff
+make setup      # Install deps with uv (uv sync --group dev)
+make test       # Run tests with coverage
+make lint       # Check formatting and linting with ruff
+make typecheck  # Type check with ty
 ```
 
 Run a single test:
 ```bash
-venv/bin/pytest tests/test_expr.py -vv
-venv/bin/pytest tests/test_expr.py::test_name -vv
+uv run pytest tests/test_expr.py -vv
+uv run pytest tests/test_expr.py::test_name -vv
 ```
 
 Run the N-Queens example:
 ```bash
-python -m satisfaction.examples.queens N
+uv run python -m satisfaction.examples.queens N
 ```
 
 ## Architecture

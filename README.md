@@ -23,10 +23,12 @@ at the test suite.
 
 ## Setup
 
+Requires [uv](https://docs.astral.sh/uv/).
+
 ```
 git clone git@github.com:davesque/satisfaction.git
 cd satisfaction
-make
+make setup
 ```
 
 ## Running the tests
@@ -34,4 +36,11 @@ make
 From the project root directory:
 ```
 make test
+```
+
+## Linting and type checking
+
+```
+make lint
+make typecheck
 ```
